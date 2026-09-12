@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------
+// Niche 1: Salaries (Зарплаты по штатам и профессиям)
+// ----------------------------------------------------
+model Salary {
+  id          Int      @id @default(autoincrement())
+  state       String   // "Texas"
+  city        String   // "Austin"
+  profession  String   // "Dental Assistant"
+  slug        String   @unique // "texas-austin-dental-assistant"
+  avgSalary   Int      // 45000
+  jobCount    Int      // 1200
+  description String?  // Optional AI generated text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([state, city])
+}
+
+// ----------------------------------------------------
+// Niche 2: Cars (Характеристики автомобилей)
+// ----------------------------------------------------
+model Car {
+  id           Int      @id @default(autoincrement())
+  make         String   // "Toyota"
+  model        String   // "Camry"
+  year         Int      // 2023
+  slug         String   @unique // "toyota-camry-2023"
+  engine       String?  // "2.5L 4-Cylinder"
+  horsepower   Int?     // 203
+  mpgCity      Int?
+  mpgHighway   Int?
+  description  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([make, model])
+}
+
+// ----------------------------------------------------
+// Niche 3: Weather (Климат по городам)
+// ----------------------------------------------------
+model Weather {
+  id             Int      @id @default(autoincrement())
+  country        String   
+  state          String?
+  city           String
+  slug           String   @unique // "us-texas-austin"
+  avgTempHigh    Float
+  avgTempLow     Float
+  rainDaysPerYear Int?
+  bestTimeToVisit String?
+  description    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([country, city])
+}

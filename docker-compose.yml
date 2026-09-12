@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: seo_user
+      POSTGRES_PASSWORD: CHANGE_ME_IN_ENV
+      POSTGRES_DB: seo_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  web:
+    build: .
+    restart: always
+    ports:
+      - "80:3000"
+    environment:
+      - DATABASE_URL=postgresql://seo_user:CHANGE_ME_IN_ENV@postgres:5432/seo_db?schema=public
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:
