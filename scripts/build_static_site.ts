@@ -41,6 +41,9 @@ function slug(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
+/** Required on every published site: AdSense asks for them, readers expect them. */
+const COMMON_PAGES = ['/about', '/contact', '/privacy'];
+
 const SECTIONS: Record<string, Section> = {
   frost: {
     root: '/frost',
@@ -56,6 +59,7 @@ const SECTIONS: Record<string, Section> = {
       });
       return [
         '/frost',
+        ...COMMON_PAGES,
         ...zones.map((z) => `/frost/zone/${z.zone}`),
         ...zips.map((z) => `/frost/${z.slug}`),
       ];
@@ -85,6 +89,7 @@ const SECTIONS: Record<string, Section> = {
       const models = [...new Set(vehicles.map((v) => `${v.make}-${v.model}`))];
       return [
         '/recalls',
+        ...COMMON_PAGES,
         ...makes.map((m) => `/recalls/make/${slug(m)}`),
         ...models.map((m) => `/recalls/model/${slug(m)}`),
         ...campaigns.map((c) => `/recalls/campaign/${c.campaignNumber.toLowerCase()}`),

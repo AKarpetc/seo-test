@@ -8,6 +8,7 @@ import {
   Page, Card, Stat, Breadcrumbs, PageHeader, JsonLd, AnswerBox, Prose, SectionHeading,
 } from '@/components/Layout';
 import { ShareBar } from '@/components/Share';
+import { AdSlot } from '@/components/Ads';
 
 export const revalidate = 86400;
 
@@ -94,6 +95,8 @@ export default async function ZipFrostPage({ params }: Props) {
         <ShareBar title={shareTitle} summary={summary ?? undefined} />
       </div>
 
+      <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOP} />
+
       {calendar.length > 0 ? (
         <section className="mt-10">
           <SectionHeading id="calendar">Planting calendar for {zip.zip}</SectionHeading>
@@ -175,6 +178,8 @@ export default async function ZipFrostPage({ params }: Props) {
           </Card>
         </section>
       ) : null}
+
+      <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BOTTOM} />
 
       <div className="mt-10 border-t border-edge pt-6">
         <ShareBar title={shareTitle} summary={summary ?? undefined} />

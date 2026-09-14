@@ -77,6 +77,11 @@ export function Page({ children }: { children: React.ReactNode }) {
       <footer className="no-print mt-12 border-t border-edge bg-surface">
         <div className="mx-auto max-w-5xl space-y-2 px-4 py-8 text-sm text-faint sm:px-6">
           <p className="max-w-2xl">{SOURCE_NOTE[process.env.NEXT_PUBLIC_SITE_SECTION || 'all'] ?? SOURCE_NOTE.all}</p>
+          <nav aria-label="Site information" className="flex flex-wrap gap-x-5 gap-y-1 pt-1">
+            <Link href="/about" className="hover:text-accent">About</Link>
+            <Link href="/contact" className="hover:text-accent">Contact</Link>
+            <Link href="/privacy" className="hover:text-accent">Privacy</Link>
+          </nav>
           <p>
             © {new Date().getFullYear()} {SITE_NAME}
           </p>

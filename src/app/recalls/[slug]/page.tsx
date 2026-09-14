@@ -7,6 +7,7 @@ import {
   Page, Card, Breadcrumbs, PageHeader, JsonLd, AnswerBox, Prose, SectionHeading, CallLink,
 } from '@/components/Layout';
 import { ShareBar } from '@/components/Share';
+import { AdSlot } from '@/components/Ads';
 
 export const revalidate = 86400;
 
@@ -95,6 +96,8 @@ export default async function RecallPage({ params }: Props) {
       <div className="mt-5">
         <ShareBar title={`${name} recalls`} summary={answer} />
       </div>
+
+      <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOP} />
 
       <section className="mt-10">
         <SectionHeading id="recalls">
@@ -192,6 +195,8 @@ export default async function RecallPage({ params }: Props) {
           </Card>
         </section>
       ) : null}
+
+      <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BOTTOM} />
 
       <div className="mt-10 border-t border-edge pt-6">
         <ShareBar title={`${name} recalls`} summary={answer} />

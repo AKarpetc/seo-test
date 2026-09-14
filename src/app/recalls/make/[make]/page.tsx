@@ -8,6 +8,7 @@ import {
   Page, Card, Stat, Breadcrumbs, PageHeader, JsonLd, AnswerBox, Prose, SectionHeading, CallLink,
 } from '@/components/Layout';
 import { ShareBar } from '@/components/Share';
+import { AdSlot } from '@/components/Ads';
 
 export const revalidate = 86400;
 
@@ -107,6 +108,8 @@ export default async function MakePage({ params }: Props) {
         <ShareBar title={`${make} recalls`} summary={answer} />
       </div>
 
+      <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOP} />
+
       <section className="mt-10">
         <SectionHeading id="models">{make} models, most recalls first</SectionHeading>
         <Card className="overflow-hidden">
@@ -179,6 +182,8 @@ export default async function MakePage({ params }: Props) {
           <CallLink number={NHTSA_HOTLINE} label={`Call NHTSA ${NHTSA_HOTLINE}`} />
         </div>
       </section>
+
+      <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BOTTOM} />
 
       <div className="mt-10 border-t border-edge pt-6">
         <ShareBar title={`${make} recalls`} summary={answer} />
