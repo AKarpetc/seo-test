@@ -84,11 +84,14 @@ const SECTIONS: Record<string, Section> = {
   },
 };
 
-/** A URL path becomes dir/index.html so the host serves it without rewrites. */
+/** A URL path becomes path.html, which the host serves at the slashless URL the
+ * canonical tag and the sitemap both declare. Writing dir/index.html instead costs
+ * a 308 redirect on every page. */
 function outputFile(outDir: string, urlPath: string): string {
   const [clean, query] = urlPath.split('?');
-  const name = query ? `${clean.replace(/\/$/, '')}/${query.replace(/[^a-z0-9=]/gi, '-')}` : clean;
-  const rel = name === '/' ? 'index.html' : path.join(name.replace(/^\//, ''), 'index.html');
+  const base = clean.replace(/\/+$/, '');
+  const name = query ? `${base}/${query.replace(/[^a-z0-9=]/gi, '-')}` : base;
+  const rel = name === '' ? 'index.html' : `${name.replace(/^\//, '')}.html`;
   return path.join(outDir, rel);
 }
 
