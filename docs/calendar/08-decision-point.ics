@@ -1,0 +1,30 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//seo//programmatic SEO//RU
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Точка решения по проекту
+BEGIN:VEVENT
+UID:decision@frostdatefinder.com
+DTSTAMP:20260914T120000Z
+DTSTART;VALUE=DATE:20270510
+SUMMARY:Точка решения по проекту
+DESCRIPTION:Сезон прошёл\, данные есть. Решать
+  на цифрах\, а не на ощущениях.\n\nВопросы:
+ \n- Сколько страниц реально в индексе из 
+ 32 604?\n- Какой был пик трафика в сезон?\n- О
+ купил ли домен ($1.33/мес) себя?\n\nЕсли да —
+  масштабировать по правилу отбора из docs
+ /КУДА_РАСШИРЯТЬСЯ.md:\nниша живёт\, только
+  если рядом с запросом никто не продаёт 
+ дорогой товар.\nЕсли нет — закрывать бе
+ з сожалений\, эксперимент стоил цены до
+ мена.
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Точка решения по проекту
+END:VALARM
+END:VEVENT
+END:VCALENDAR

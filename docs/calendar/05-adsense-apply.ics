@@ -1,0 +1,33 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//seo//programmatic SEO//RU
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Подать заявку в AdSense
+BEGIN:VEVENT
+UID:adsense-apply@frostdatefinder.com
+DTSTAMP:20260914T120000Z
+DTSTART;VALUE=DATE:20261214
+SUMMARY:Подать заявку в AdSense
+DESCRIPTION:БЕЗ ЭТОГО ДОХОДА НЕ БУДЕТ ВООБЩЕ. 
+ Рекламного кода на сайтах пока нет.\n\nПо
+ давать в декабре\, а не в феврале: рассмо
+ трение занимает от дней до недель\,\nи по
+ дача в разгар сезона означает потерю са
+ мого сезона.\n\nЧто нужно до подачи:\n- стр
+ аница политики конфиденциальности (обя
+ зательна для AdSense)\n- немного органическ
+ ого трафика — с нулём заявку часто откл
+ оняют\n- рекламный код на страницах + пер
+ есборка и выкладка\n\nПороги сетей: AdSense 
+ — нет порога\, RPM $5-8. Raptive — 25 000 просмотр
+ ов/мес\,\nRPM $20+. Journey by Mediavine — от 1 000 сесси
+ й/мес.
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Подать заявку в AdSense
+END:VALARM
+END:VEVENT
+END:VCALENDAR

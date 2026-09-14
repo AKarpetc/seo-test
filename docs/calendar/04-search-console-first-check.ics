@@ -1,0 +1,31 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//seo//programmatic SEO//RU
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Search Console: первая осмысленная пров
+ ерка
+BEGIN:VEVENT
+UID:gsc-first-check@frostdatefinder.com
+DTSTAMP:20260914T120000Z
+DTSTART;VALUE=DATE:20261207
+SUMMARY:Search Console: первая осмысленная провер
+ ка
+DESCRIPTION:Раньше декабря данных не будет\, д
+ о этого не трогать.\n\nСмотреть два отчёт
+ а:\n- Pages (Страницы): сколько проиндексиро
+ вано против найденного.\n  Статус "Discovered 
+ - currently not indexed" у большинства — норма для
+  молодого домена.\n- Performance (Эффективност
+ ь): появились ли первые показы.\n\nНичего 
+ не переотправлять и не править по резул
+ ьтатам — просто записать цифры.
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Search Console: первая осмысленная пров
+ ерка
+END:VALARM
+END:VEVENT
+END:VCALENDAR

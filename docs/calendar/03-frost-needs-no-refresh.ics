@@ -1,0 +1,29 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//seo//programmatic SEO//RU
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:К сведению: заморозки обновлять 
+ НЕ надо
+BEGIN:VEVENT
+UID:frost-no-refresh@frostdatefinder.com
+DTSTAMP:20260914T120000Z
+DTSTART;VALUE=DATE:20261005
+SUMMARY:К сведению: заморозки обновлять НЕ 
+ надо
+DESCRIPTION:Нормали NOAA — тридцатилетние сред
+ ние\, набор 1991-2020 действует примерно до 2
+ 031 года.\nЗоны USDA обновляются раз в десят
+ илетие\, последний раз в 2023.\n\nТо есть да
+ нные frostdatefinder.com не устаревают. Повторят
+ ь загрузку незачем.\nСобытие разовое — 
+ можно удалить после прочтения.
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:К сведению: заморозки обновлять Н
+ Е надо
+END:VALARM
+END:VEVENT
+END:VCALENDAR

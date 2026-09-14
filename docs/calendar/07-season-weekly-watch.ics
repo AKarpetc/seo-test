@@ -1,0 +1,30 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//seo//programmatic SEO//RU
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Сезон заморозок: записать трафик
+  за неделю
+BEGIN:VEVENT
+UID:season-watch@frostdatefinder.com
+DTSTAMP:20260914T120000Z
+DTSTART;VALUE=DATE:20270201
+SUMMARY:Сезон заморозок: записать трафик за
+  неделю
+DESCRIPTION:Февраль-апрель — единственная бл
+ изкая проверка гипотезы.\nПрогноз: 15-60 т
+ ыс. визитов\, $120-500/мес. Вероятность прев
+ ысить $100/мес — 40-45%.\n\nЗаписывать: показы
+  и клики в Search Console\, визиты в аналитике.\n
+ Не менять сайт в разгар сезона — иначе 
+ непонятно\, что именно сработало.
+TRANSP:TRANSPARENT
+RRULE:FREQ=WEEKLY;BYDAY=MO;UNTIL=20270430
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Сезон заморозок: записать трафик 
+ за неделю
+END:VALARM
+END:VEVENT
+END:VCALENDAR

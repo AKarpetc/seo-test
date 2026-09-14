@@ -1,0 +1,28 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//seo//programmatic SEO//RU
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Обновить отзывы авто (NHTSA)
+BEGIN:VEVENT
+UID:recalls-refresh@frostdatefinder.com
+DTSTAMP:20260914T120000Z
+DTSTART;VALUE=DATE:20261005
+SUMMARY:Обновить отзывы авто (NHTSA)
+DESCRIPTION:NHTSA выпускает примерно 10 новых ка
+ мпаний в месяц по нашим 41 марке.\n\ncd ~/seo\nn
+ pm run load:recalls        # ~70 минут\, можно оставит
+ ь без присмотра\nnpm run publish -- recalls\n\nВыклад
+ ка сама сообщит IndexNow только об изменивш
+ ихся страницах.\nРаз в год\, примерно в с
+ ентябре\, заодно проверить\, появился ли
+  новый модельный год.
+TRANSP:TRANSPARENT
+RRULE:FREQ=MONTHLY;BYMONTHDAY=5
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Обновить отзывы авто (NHTSA)
+END:VALARM
+END:VEVENT
+END:VCALENDAR

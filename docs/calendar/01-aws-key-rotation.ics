@@ -1,0 +1,26 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//seo//programmatic SEO//RU
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Ротировать ключ AWS
+BEGIN:VEVENT
+UID:aws-rotate@frostdatefinder.com
+DTSTAMP:20260914T120000Z
+DTSTART;VALUE=DATE:20260928
+SUMMARY:Ротировать ключ AWS
+DESCRIPTION:У текущего ключа права ec2:*\, rds:*\, iam
+ :CreateRole — намного больше\, чем нужно ETL.\n\n
+ Завести отдельный ключ только на s3:* по 
+ бакетам seo-pr-*\, старый отозвать.\nОбновит
+ ь AWS_ACCESS_KEY_ID и AWS_SECRET_ACCESS_KEY в ~/seo/.env\n\nЭто е
+ динственный незакрытый хвост по безопа
+ сности.
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Ротировать ключ AWS
+END:VALARM
+END:VEVENT
+END:VCALENDAR

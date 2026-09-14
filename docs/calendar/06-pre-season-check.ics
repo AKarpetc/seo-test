@@ -1,0 +1,27 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//seo//programmatic SEO//RU
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Проверка перед сезоном заморозо
+ к
+BEGIN:VEVENT
+UID:pre-season@frostdatefinder.com
+DTSTAMP:20260914T120000Z
+DTSTART;VALUE=DATE:20270125
+SUMMARY:Проверка перед сезоном заморозок
+DESCRIPTION:Сезон начинается в феврале. Убеди
+ ться\, что всё живо:\n\ncurl -s -o /dev/null -w "%{http_co
+ de}\\n" https://frostdatefinder.com/frost\n\nПроверить в Searc
+ h Console\, что индексация выросла с декабря
+ .\nЕсли страниц в индексе мало — это отв
+ ет на вопрос о проекте\, а не повод срочн
+ о что-то менять.
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Проверка перед сезоном заморозок
+END:VALARM
+END:VEVENT
+END:VCALENDAR
