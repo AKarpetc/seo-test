@@ -1,0 +1,33 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AppDeploymentAdmin",
+            "Effect": "Allow",
+            "Action": [
+                "s3:*",
+                "ecr:*",
+                "ecs:*",
+                "rds:*",
+                "ec2:*",
+                "elasticloadbalancing:*",
+                "route53:*",
+                "acm:*",
+                "logs:*",
+                "iam:CreateRole",
+                "iam:AttachRolePolicy",
+                "iam:GetRole",
+                "iam:PutRolePolicy"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "IAMPassRoleForECS",
+            "Effect": "Allow",
+            "Action": [
+                "iam:PassRole"
+            ],
+            "Resource": "arn:aws:iam::*:role/ecsTaskExecutionRole"
+        }
+    ]
+}

@@ -1,3 +1,5 @@
+> **Superseded (2026-09-13).** Manual EC2 walkthrough. The deploy is now CloudFormation: [DEPLOY.md](DEPLOY.md).
+
 # Руководство по развертыванию на AWS (EC2 + Docker)
 
 Так как у вас локально не установлен AWS CLI, процесс переноса нашего локального приложения на сервера Amazon (Phase 4) потребует от вас нескольких кликов в панели управления AWS.
