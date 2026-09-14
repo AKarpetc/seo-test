@@ -26,6 +26,10 @@ const SECTION_NAV: Record<string, NavLink[]> = {
     { href: '/recalls', label: 'All recalls' },
     { href: '/recalls/make/toyota', label: 'By make' },
   ],
+  storms: [
+    { href: '/storms', label: 'By city' },
+    { href: '/storms/state/fl', label: 'By state' },
+  ],
 };
 
 const FULL_NAV: NavLink[] = [
@@ -35,6 +39,7 @@ const FULL_NAV: NavLink[] = [
   { href: '/trucking', label: 'Carriers' },
   { href: '/frost', label: 'Frost dates' },
   { href: '/recalls', label: 'Recalls' },
+  { href: '/storms', label: 'Storms' },
 ];
 
 export function navLinks(): NavLink[] {

@@ -97,6 +97,24 @@ const SECTIONS: Record<string, Section> = {
       ];
     },
   },
+  storms: {
+    root: '/storms',
+    paths: async () => {
+      const cities = await prisma.stormCity.findMany({
+        where: { OR: [{ hurricaneCount: { gt: 0 } }, { tropicalStormCount: { gt: 0 } }, { tornadoCount: { gt: 0 } }] },
+        select: { slug: true, state: true },
+      });
+      const storms = await prisma.storm.findMany({ where: { cityCount: { gt: 0 } }, select: { slug: true } });
+      const states = [...new Set(cities.map((c) => c.state.toLowerCase()))];
+      return [
+        '/storms',
+        ...COMMON_PAGES,
+        ...states.map((s) => `/storms/state/${s}`),
+        ...storms.map((s) => `/storms/hurricane/${s.slug}`),
+        ...cities.map((c) => `/storms/${c.slug}`),
+      ];
+    },
+  },
   energy: {
     root: '/energy',
     paths: async () => {

@@ -10,7 +10,7 @@
 
 set -euo pipefail
 
-SECTION="${1:?usage: publish-site.sh <frost|recalls> [--dry-run]}"
+SECTION="${1:?usage: publish-site.sh <frost|recalls|storms> [--dry-run]}"
 DRY_RUN="${2:-}"
 PORT=3100
 
@@ -25,8 +25,13 @@ case "$SECTION" in
     export NEXT_PUBLIC_SITE_NAME="Check Car Recalls"
     PROJECT="check-car-recalls"
     ;;
+  storms)
+    export NEXT_PUBLIC_SITE_URL="https://stormsthathit.com"
+    export NEXT_PUBLIC_SITE_NAME="Storms That Hit"
+    PROJECT="storms-that-hit"
+    ;;
   *)
-    echo "Unknown section: $SECTION (expected frost or recalls)"; exit 1 ;;
+    echo "Unknown section: $SECTION (expected frost, recalls or storms)"; exit 1 ;;
 esac
 
 export NEXT_PUBLIC_SITE_SECTION="$SECTION"

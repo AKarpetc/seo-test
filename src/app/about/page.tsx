@@ -29,6 +29,19 @@ const SECTIONS: Record<string, { what: string; source: string; caveat: string }>
       'A normal is a thirty-year average, not a forecast. Any individual year can freeze two to ' +
       'three weeks either side of these dates, so check the actual forecast before planting out.',
   },
+  storms: {
+    what:
+      'For every US city with more than 2,000 people, the hurricanes and tropical storms whose track ' +
+      'passed within 75 miles since 1851 and the tornadoes that touched down within 25 miles since ' +
+      '1950 — how close each came, how strong it was at that point, and when.',
+    source:
+      "The National Hurricane Center's HURDAT2 best-track database and the Storm Prediction Center's " +
+      'tornado database, both published by NOAA. Distances are measured from the city centre to the track.',
+    caveat:
+      'Closeness to a track is not the same as damage: the worst winds sit within a few dozen miles ' +
+      'of a hurricane\'s centre, and older tornado records under-count weak tornadoes in open country. ' +
+      'Nothing here is a forecast or a risk rating.',
+  },
   recalls: {
     what:
       'Every NHTSA safety recall on mainstream passenger vehicles from 2000 onward, and on RVs, ' +

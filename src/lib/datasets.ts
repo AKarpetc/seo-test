@@ -8,7 +8,7 @@ import { prisma } from '@/lib/prisma';
 export type DatasetKey =
   | 'doctors' | 'banks' | 'aircraft' | 'trucking' | 'nutrition'
   | 'climate' | 'executives' | 'broadband' | 'demographics' | 'energy' | 'trademark'
-  | 'recalls';
+  | 'recalls' | 'storms';
 
 export type DatasetConfig = {
   key: DatasetKey;
@@ -43,6 +43,16 @@ export const DATASETS: Record<DatasetKey, DatasetConfig> = {
     source: 'NHTSA',
     sourceUrl: 'https://www.nhtsa.gov/recalls',
     count: () => prisma.vehicle.count(),
+  },
+  storms: {
+    key: 'storms',
+    path: '/storms',
+    name: 'Storm History',
+    title: 'Hurricanes and Tornadoes by City',
+    description: 'Every tropical system within 75 miles and every tornado within 25 miles of each US city, from the NHC and SPC records.',
+    source: 'NHC HURDAT2 · SPC',
+    sourceUrl: 'https://www.nhc.noaa.gov/data/',
+    count: () => prisma.stormCity.count(),
   },
   banks: {
     key: 'banks',

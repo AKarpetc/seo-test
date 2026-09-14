@@ -307,27 +307,28 @@ model FoodNutrition {
 // Search demand runs on ZIP and zone ("frost date for zone 6b", "by zip code"),
 // while the underlying normals are published per station — this table joins them.
 model ZipClimate {
-  id            Int      @id @default(autoincrement())
-  zip           String   @unique
-  zone          String? // USDA hardiness zone, e.g. "8b"
-  zoneTempRange String? // "15 to 20" (F)
-  lat           Float?
-  lng           Float?
-  city          String?
-  state         String?
-  county        String?
-  population    Int?
-  stationId     String? // nearest ClimateData station
-  stationMiles  Float?
+  id               Int      @id @default(autoincrement())
+  zip              String   @unique
+  zone             String? // USDA hardiness zone, e.g. "8b"
+  zoneTempRange    String? // "15 to 20" (F)
+  lat              Float?
+  lng              Float?
+  city             String?
+  state            String?
+  county           String?
+  population       Int?
+  stationId        String? // nearest ClimateData station
+  stationMiles     Float?
   snowStationId    String? // nearest station that actually reports snowfall
   snowStationMiles Float?
-  slug          String   @unique
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  slug             String   @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@index([zone])
   @@index([state, city])
   @@index([stationId])
+  @@index([snowStationId])
 }
 
 model ClimateData {
@@ -531,4 +532,124 @@ model VehicleRecall {
 
   @@unique([campaignNumber, vehicleId])
   @@index([vehicleId])
+}
+
+// ----------------------------------------------------
+// Storm history: tropical cyclones (NHC HURDAT2) and tornadoes (SPC), joined
+// to cities by distance from the track. One page per city answers "which
+// storms have hit here"; storm and state pages are the hubs that link them.
+// ----------------------------------------------------
+
+model Storm {
+  id        Int          @id @default(autoincrement())
+  stormId   String       @unique // "AL092022"
+  basin     String // "AL" Atlantic, "EP" north-east Pacific
+  name      String // "IAN", or "UNNAMED"
+  year      Int
+  maxWind   Int? // knots
+  category  Int? // 0 = tropical storm, 1–5 Saffir-Simpson at peak
+  firstDate DateTime?
+  lastDate  DateTime?
+  cityCount Int          @default(0)
+  slug      String       @unique // "ian-2022"
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  points    StormPoint[]
+  cities    CityStorm[]
+
+  @@index([year])
+  @@index([name])
+  @@index([cityCount])
+}
+
+model StormPoint {
+  id      Int      @id @default(autoincrement())
+  stormId Int
+  storm   Storm    @relation(fields: [stormId], references: [id], onDelete: Cascade)
+  time    DateTime
+  lat     Float
+  lng     Float
+  wind    Int? // knots
+  status  String // HU, TS, TD, EX, ...
+
+  @@index([stormId])
+}
+
+model Tornado {
+  id          Int           @id @default(autoincrement())
+  spcKey      String        @unique // "1950-192"
+  date        DateTime
+  state       String
+  mag         Int? // EF/F rating, null when unknown
+  injuries    Int           @default(0)
+  fatalities  Int           @default(0)
+  startLat    Float
+  startLng    Float
+  endLat      Float?
+  endLng      Float?
+  lengthMiles Float?
+  widthYards  Int?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  cities      CityTornado[]
+
+  @@index([date])
+  @@index([mag])
+  @@index([state])
+}
+
+model StormCity {
+  id                 Int           @id @default(autoincrement())
+  city               String
+  state              String
+  slug               String        @unique // "houston-tx"
+  lat                Float
+  lng                Float
+  population         Int?
+  hurricaneCount     Int           @default(0)
+  tropicalStormCount Int           @default(0)
+  lastStormYear      Int?
+  lastStormName      String?
+  strongestCategory  Int?
+  strongestStormName String?
+  tornadoCount       Int           @default(0)
+  strongTornadoCount Int           @default(0) // EF3 and up
+  tornadoFatalities  Int           @default(0)
+  lastTornadoYear    Int?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  storms             CityStorm[]
+  tornadoes          CityTornado[]
+
+  @@unique([city, state])
+  @@index([state])
+  @@index([hurricaneCount])
+  @@index([tornadoCount])
+}
+
+model CityStorm {
+  id              Int       @id @default(autoincrement())
+  cityId          Int
+  city            StormCity @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  stormId         Int
+  storm           Storm     @relation(fields: [stormId], references: [id], onDelete: Cascade)
+  closestMiles    Float
+  windAtClosest   Int?
+  statusAtClosest String?
+  closestTime     DateTime?
+
+  @@unique([cityId, stormId])
+  @@index([stormId])
+}
+
+model CityTornado {
+  id        Int       @id @default(autoincrement())
+  cityId    Int
+  city      StormCity @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  tornadoId Int
+  tornado   Tornado   @relation(fields: [tornadoId], references: [id], onDelete: Cascade)
+  miles     Float
+
+  @@unique([cityId, tornadoId])
+  @@index([tornadoId])
 }

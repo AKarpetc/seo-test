@@ -11,6 +11,7 @@ import { prisma } from './lib/etl';
 const SITES = [
   { name: 'frostdatefinder.com', probe: '/frost' },
   { name: 'checkcarrecalls.com', probe: '/recalls' },
+  { name: 'stormsthathit.com', probe: '/storms' },
 ];
 
 const BROWSER_UA =
