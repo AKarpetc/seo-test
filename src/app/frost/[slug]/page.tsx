@@ -16,9 +16,17 @@ type Props = { params: Promise<{ slug: string }> };
 
 async function getZip(slug: string) {
   const zip = await prisma.zipClimate.findUnique({ where: { slug } });
-  if (!zip?.stationId) return zip ? { zip, station: null } : null;
-  const station = await prisma.climateData.findUnique({ where: { stationId: zip.stationId } });
-  return { zip, station };
+  if (!zip) return null;
+  const [station, snowStation] = await Promise.all([
+    zip.stationId ? prisma.climateData.findUnique({ where: { stationId: zip.stationId } }) : null,
+    zip.snowStationId
+      ? prisma.climateData.findUnique({
+          where: { stationId: zip.snowStationId },
+          select: { stationName: true, firstSnowDate: true, lastSnowDate: true, snowSeasons: true, snowySeasons: true, annualSnowfall: true },
+        })
+      : null,
+  ]);
+  return { zip, station, snowStation };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -26,12 +34,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const data = await getZip(slug);
   if (!data) return { title: 'ZIP code not found' };
 
-  const { zip, station } = data;
+  const { zip, station, snowStation } = data;
   const place = zip.city ? `${zip.city}, ${zip.state}` : `ZIP ${zip.zip}`;
   const title = `Frost Dates for ${zip.zip} (${place}) — Zone ${zip.zone ?? ''} Planting Calendar`.replace(' ()', '');
+  const snow = snowStation?.firstSnowDate ? ` First snow usually around ${snowStation.firstSnowDate}.` : '';
   const description = station?.lastFrostDate
-    ? `Last spring frost in ${place} is around ${station.lastFrostDate}, first fall frost around ${station.firstFrostDate}. USDA hardiness zone ${zip.zone}. When to plant in ZIP ${zip.zip}.`
-    : `USDA hardiness zone ${zip.zone} for ZIP ${zip.zip} (${place}), with the nearest NOAA station's climate normals.`;
+    ? `Last spring frost in ${place} is around ${station.lastFrostDate}, first fall frost around ${station.firstFrostDate}.${snow} USDA hardiness zone ${zip.zone}. When to plant in ZIP ${zip.zip}.`
+    : `USDA hardiness zone ${zip.zone} for ZIP ${zip.zip} (${place}), with the nearest NOAA station's climate normals.${snow}`;
 
   return { title, description, alternates: { canonical: absoluteUrl(`/frost/${slug}`) }, openGraph: { title, description } };
 }
@@ -41,11 +50,17 @@ export default async function ZipFrostPage({ params }: Props) {
   const data = await getZip(slug);
   if (!data) notFound();
 
-  const { zip, station } = data;
+  const { zip, station, snowStation: snow } = data;
   const place = zip.city ? `${zip.city}, ${stateName(zip.state)}` : `ZIP ${zip.zip}`;
   const calendar = plantingCalendar(station?.lastFrostDate, station?.firstFrostDate);
   const summary = frostSummary(station?.lastFrostDate, station?.firstFrostDate, station?.growingDays);
   const shareTitle = `Frost dates for ${zip.zip} — ${place}`;
+  const snowKnown = Boolean(snow?.snowSeasons);
+  const snowRare = snowKnown && !snow?.firstSnowDate;
+  const snowShare = snowKnown ? Math.round(((snow?.snowySeasons ?? 0) / (snow?.snowSeasons ?? 1)) * 100) : null;
+  const snowSource = snow && zip.snowStationId !== zip.stationId
+    ? `${snow.stationName}, ${zip.snowStationMiles} miles away`
+    : snow?.stationName ?? '';
 
   const nearby = zip.state
     ? await prisma.zipClimate.findMany({
@@ -91,11 +106,48 @@ export default async function ZipFrostPage({ params }: Props) {
         <Stat label="Hardiness zone" value={zip.zone || '—'} hint={zip.zoneTempRange ? `${zip.zoneTempRange}°F annual low` : undefined} />
       </dl>
 
+      {snowKnown ? (
+        <dl className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <Stat label="First snow" value={snow?.firstSnowDate || (snowRare ? 'Rare' : '—')} hint="median, 1991–2020" />
+          <Stat label="Last snow" value={snow?.lastSnowDate || (snowRare ? 'Rare' : '—')} hint="median, 1991–2020" />
+          <Stat label="Winters with snow" value={`${snowShare}%`} hint={`${snow?.snowySeasons} of ${snow?.snowSeasons} observed`} />
+          <Stat label="Snow per year" value={snow?.annualSnowfall != null ? `${snow.annualSnowfall}"` : '—'} hint="NOAA normal" />
+        </dl>
+      ) : null}
+
       <div className="mt-6">
         <ShareBar title={shareTitle} summary={summary ?? undefined} />
       </div>
 
       <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOP} />
+
+      {snowKnown ? (
+        <section className="mt-10">
+          <SectionHeading id="snow">When it snows in {place}</SectionHeading>
+          <Prose className="space-y-4">
+            {snow?.firstSnowDate ? (
+              <p>
+                The first measurable snow (0.1 inch or more) in {place} usually arrives around{' '}
+                <strong>{snow.firstSnowDate}</strong>, and the last of the season around{' '}
+                <strong>{snow.lastSnowDate}</strong>. Those are the middle dates across the winters of
+                1991–2020 at {snowSource}: half of years saw snow earlier, half later.
+                {snowShare !== null && snowShare < 100 ? ` Snow fell in ${snowShare}% of those winters.` : ' Every one of those winters saw snow.'}
+              </p>
+            ) : (
+              <p>
+                Measurable snow is rare here: only <strong>{snow?.snowySeasons} of {snow?.snowSeasons}</strong>{' '}
+                winters from 1991 to 2020 recorded 0.1 inch or more at {snowSource}, so there is no
+                typical first-snow date to plan around.
+              </p>
+            )}
+            <p>
+              For a gardener, snow matters less than frost: a light snow on frozen ground changes nothing,
+              while a hard frost on an unprotected bed ends the season. Use the frost dates above for
+              planting and the snow dates for getting hoses drained, mulch down and tender pots indoors.
+            </p>
+          </Prose>
+        </section>
+      ) : null}
 
       {calendar.length > 0 ? (
         <section className="mt-10">

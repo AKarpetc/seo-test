@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 
 const title = 'Frost Dates by ZIP Code — First & Last Frost, Planting Calendar';
 const description =
-  'Look up the first and last frost date for any US ZIP code, with the USDA hardiness zone and growing season length. Thirty-year NOAA climate normals.';
+  'Look up the first and last frost date for any US ZIP code, with the USDA hardiness zone, growing season length and the usual first snow. Thirty-year NOAA climate normals.';
 
 export const metadata: Metadata = {
   title,
@@ -65,7 +65,7 @@ export default async function FrostIndex() {
       <PageHeader
         eyebrow="NOAA 1991–2020 Normals · USDA Hardiness Zones"
         title="Frost Dates by ZIP Code"
-        subtitle={`${formatNumber(total)} ZIP codes with first and last frost dates, hardiness zone and growing season length.`}
+        subtitle={`${formatNumber(total)} ZIP codes with first and last frost dates, hardiness zone, growing season length and the usual first and last snow.`}
       />
 
       <GroupLinks
