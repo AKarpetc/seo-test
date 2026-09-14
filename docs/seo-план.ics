@@ -1,0 +1,153 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//seo//programmatic SEO//RU
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:SEO — заморозки и отзывы авто
+BEGIN:VEVENT
+UID:aws-rotate@frostdatefinder.com
+DTSTAMP:20260914T120000Z
+DTSTART;VALUE=DATE:20260928
+SUMMARY:Ротировать ключ AWS
+DESCRIPTION:У текущего ключа права ec2:*\, rds:*\, iam
+ :CreateRole — намного больше\, чем нужно ETL.\nЗ
+ авести отдельный ключ только на s3:* по б
+ акетам seo-pr-*\, старый отозвать.\nЭто един
+ ственный незакрытый хвост по безопасно
+ сти.
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Ротировать ключ AWS
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:recalls-refresh@frostdatefinder.com
+DTSTAMP:20260914T120000Z
+DTSTART;VALUE=DATE:20261005
+SUMMARY:Обновить отзывы авто (NHTSA)
+DESCRIPTION:NHTSA выпускает примерно 10 новых ка
+ мпаний в месяц по нашим 41 марке.\n\ncd ~/seo\nn
+ pm run load:recalls        # ~70 минут\, можно оставит
+ ь без присмотра\nnpm run publish -- recalls\n\nВыклад
+ ка сама сообщит IndexNow только об изменивш
+ ихся страницах.\nРаз в год\, примерно в с
+ ентябре\, заодно проверить\, появился ли
+  новый модельный год.
+TRANSP:TRANSPARENT
+RRULE:FREQ=MONTHLY;BYMONTHDAY=5
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Обновить отзывы авто (NHTSA)
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:frost-no-refresh@frostdatefinder.com
+DTSTAMP:20260914T120000Z
+DTSTART;VALUE=DATE:20261005
+SUMMARY:К сведению: заморозки обновлять НЕ 
+ надо
+DESCRIPTION:Нормали NOAA — тридцатилетние сред
+ ние\, набор 1991-2020 действует примерно до 2
+ 031 года.\nЗоны USDA обновляются раз в десят
+ илетие\, последний раз в 2023.\nТо есть дан
+ ные frostdatefinder.com не устаревают. Повторять
+  загрузку незачем.\nЭто событие разовое\
+ , можно удалить после прочтения.
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:К сведению: заморозки обновлять Н
+ Е надо
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:gsc-first-check@frostdatefinder.com
+DTSTAMP:20260914T120000Z
+DTSTART;VALUE=DATE:20261207
+SUMMARY:Search Console: первая осмысленная провер
+ ка
+DESCRIPTION:Раньше декабря данных не будет\, д
+ о этого не трогать.\n\nСмотреть два отчёт
+ а:\n- Pages (Страницы): сколько проиндексиро
+ вано против найденного.\n  Статус "Discovered 
+ - currently not indexed" у большинства — это норма
+  для молодого домена.\n- Performance (Эффектив
+ ность): появились ли первые показы.\n\nНи
+ чего не переотправлять и не править по 
+ результатам — просто записать цифры.
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Search Console: первая осмысленная пров
+ ерка
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:pre-season@frostdatefinder.com
+DTSTAMP:20260914T120000Z
+DTSTART;VALUE=DATE:20270125
+SUMMARY:Проверка перед сезоном заморозок
+DESCRIPTION:Сезон начинается в феврале. Убеди
+ ться\, что всё живо:\n\ncurl -s -o /dev/null -w "%{http_co
+ de}\\n" https://frostdatefinder.com/frost\nПроверить в Search 
+ Console\, что индексация выросла с декабря.\
+ n\nЕсли страниц в индексе мало — это отв
+ ет на вопрос о проекте\, а не повод срочн
+ о что-то менять.
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Проверка перед сезоном заморозок
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:season-watch@frostdatefinder.com
+DTSTAMP:20260914T120000Z
+DTSTART;VALUE=DATE:20270201
+SUMMARY:Сезон заморозок: смотреть трафик
+DESCRIPTION:Февраль-апрель — единственная бл
+ изкая проверка гипотезы.\nПрогноз: 15-60 т
+ ыс. визитов\, $120-500/мес. Вероятность прев
+ ысить $100/мес — 40-45%.\n\nРаз в неделю запис
+ ывать: показы и клики в Search Console\, визиты 
+ в аналитике.\nНе менять сайт в разгар се
+ зона — иначе непонятно\, что именно сра
+ ботало.
+TRANSP:TRANSPARENT
+RRULE:FREQ=WEEKLY;BYDAY=MO;UNTIL=20270430
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Сезон заморозок: смотреть трафик
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:decision@frostdatefinder.com
+DTSTAMP:20260914T120000Z
+DTSTART;VALUE=DATE:20270510
+SUMMARY:Точка решения по проекту
+DESCRIPTION:Сезон прошёл\, данные есть. Решать
+  на цифрах\, а не на ощущениях.\n\nВопросы:
+ \n- Сколько страниц реально в индексе из 
+ 32 604?\n- Какой был пик трафика в сезон?\n- О
+ купил ли домен ($1.33/мес) себя?\n\nЕсли да —
+  масштабировать по правилу отбора из docs
+ /КУДА_РАСШИРЯТЬСЯ.md:\nниша живёт\, только
+  если рядом с запросом никто не продаёт 
+ дорогой товар.\nЕсли нет — закрывать бе
+ з сожалений\, стоимость эксперимента бы
+ ла равна цене домена.
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Точка решения по проекту
+END:VALARM
+END:VEVENT
+END:VCALENDAR
