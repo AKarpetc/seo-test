@@ -51,6 +51,15 @@ until curl -sf "http://localhost:$PORT/api/health" >/dev/null 2>&1; do sleep 2; 
 echo "==> Rendering static pages"
 npx tsx scripts/build_static_site.ts --section "$SECTION" --origin "http://localhost:$PORT"
 
+HOST="${NEXT_PUBLIC_SITE_URL#https://}"
+
+# IndexNow verifies ownership by fetching this file, so it has to ship with the
+# site rather than be uploaded afterwards.
+if [ -n "${INDEXNOW_KEY:-}" ]; then
+  printf '%s' "$INDEXNOW_KEY" > "static/$SECTION/$INDEXNOW_KEY.txt"
+  echo "==> IndexNow key file written for $HOST"
+fi
+
 FILES=$(find "static/$SECTION" -type f | wc -l | tr -d ' ')
 if [ "$FILES" -gt 20000 ]; then
   echo "!! $FILES files exceeds the 20,000 Cloudflare Pages free-tier limit. Aborting."
@@ -65,6 +74,10 @@ fi
 
 echo "==> Deploying to Cloudflare Pages"
 npx wrangler pages deploy "static/$SECTION" --project-name "$PROJECT" --commit-dirty=true
+
+echo
+echo "==> Telling IndexNow what changed"
+npx tsx scripts/ops/indexnow.ts --dir "static/$SECTION" --host "$HOST"
 
 echo
 echo "Done. If this is the first deploy, attach the domain once:"
