@@ -165,13 +165,13 @@ export default async function ModelPage({ params }: Props) {
         <SectionHeading>Reading these numbers</SectionHeading>
         <Prose className="space-y-4">
           <p>
-            A high recall count is not the same as an unreliable car. Recalls are safety defects the
+            A high recall count is not the same as an unreliable vehicle. Recalls are safety defects the
             manufacturer reports and repairs free; a maker that files many of them is often being
             more diligent, not less. Older model years also accumulate recalls simply by existing
             longer.
           </p>
           <p>
-            What matters for a specific car is whether its own VIN is covered by an open campaign.
+            What matters for a specific vehicle is whether its own VIN is covered by an open campaign.
             Check it on{' '}
             <a href="https://www.nhtsa.gov/recalls" rel="nofollow noopener" target="_blank" className="text-accent hover:underline">
               NHTSA&apos;s lookup

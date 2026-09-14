@@ -25,7 +25,43 @@ const MAINSTREAM = [
   'volvo', 'polestar', 'lucid',
 ];
 
+/**
+ * Makes outside the passenger-car list, grouped by what they build. Search demand
+ * runs on the brand ("coachmen rv recalls", "2019 harley street glide recalls"),
+ * and NHTSA files their recalls through the same vehicle endpoints as cars.
+ */
+const SPECIALTY: Record<string, string[]> = {
+  rv: [
+    'forest river', 'coachmen', 'jayco', 'keystone', 'grand design', 'heartland',
+    'thor motor coach', 'winnebago', 'tiffin', 'newmar', 'airstream', 'entegra',
+    'dutchmen', 'crossroads', 'cruiser rv', 'alliance rv', 'brinkley rv', 'palomino',
+    'fleetwood', 'holiday rambler', 'gulf stream', 'shasta', 'nucamp', 'outdoors rv',
+    'east to west', 'dynamax', 'renegade', 'roadtrek', 'lance',
+  ],
+  motorcycle: [
+    'harley-davidson', 'indian', 'ducati', 'ktm', 'triumph', 'kawasaki', 'yamaha',
+    'suzuki', 'husqvarna', 'aprilia', 'moto guzzi', 'royal enfield', 'zero',
+  ],
+  powersports: ['polaris', 'can-am', 'arctic cat', 'cfmoto'],
+  trailer: ['big tex', 'pj trailers', 'load trail', 'sure-trac', 'carry-on'],
+};
+
+/** Which list to walk: mainstream (default), specialty, or all. */
+const MAKE_SET = process.env.RECALL_MAKES || 'mainstream';
+
+/**
+ * Specialty makes start later than cars: recall volume before 2010 is thin, and
+ * every extra page counts against the 20,000-file limit of the static host.
+ */
 const START_YEAR = parseInt(process.env.RECALL_START_YEAR || '2000', 10);
+const SPECIALTY_START_YEAR = parseInt(process.env.RECALL_SPECIALTY_START_YEAR || '2010', 10);
+
+function categoryOf(make: string): string {
+  for (const [category, makes] of Object.entries(SPECIALTY)) {
+    if (makes.includes(make)) return category;
+  }
+  return 'car';
+}
 const END_YEAR = parseInt(process.env.RECALL_END_YEAR || String(new Date().getFullYear() + 1), 10);
 const CONCURRENCY = parseInt(process.env.RECALL_CONCURRENCY || '6', 10);
 
@@ -36,7 +72,7 @@ const CONCURRENCY = parseInt(process.env.RECALL_CONCURRENCY || '6', 10);
  * before deciding anything went wrong.
  */
 async function get<T>(path: string): Promise<T | null> {
-  for (let attempt = 1; attempt <= 3; attempt++) {
+  for (let attempt = 1; attempt <= 5; attempt++) {
     try {
       const { data } = await axios.get(`${API}${path}`, {
         headers: HTTP_HEADERS,
@@ -45,11 +81,13 @@ async function get<T>(path: string): Promise<T | null> {
       });
       return data as T;
     } catch (err: any) {
-      if (attempt === 3) {
+      if (attempt === 5) {
         console.warn(`\n[!] ${path}: ${err.message}`);
         return null;
       }
-      await new Promise((r) => setTimeout(r, 1500 * attempt));
+      // 403 and 429 are NHTSA throttling, which clears after a real pause.
+      const throttled = err.response?.status === 403 || err.response?.status === 429;
+      await new Promise((r) => setTimeout(r, (throttled ? 15_000 : 1500) * attempt));
     }
   }
   return null;
@@ -87,6 +125,7 @@ async function processJob(job: Job): Promise<{ vehicles: number; recalls: number
 
     const make = titleCase(job.make)!;
     const model = titleCase(name)!;
+    const category = categoryOf(job.make);
 
     const vehicle = await prisma.vehicle.upsert({
       where: { modelYear_make_model: { modelYear: job.year, make, model } },
@@ -94,10 +133,11 @@ async function processJob(job: Job): Promise<{ vehicles: number; recalls: number
         modelYear: job.year,
         make,
         model,
+        category,
         recallCount: rows.length,
         slug: slugify(job.year, make, model, 'recalls'),
       },
-      update: { recallCount: rows.length },
+      update: { recallCount: rows.length, category },
     });
     vehicles++;
 
@@ -133,7 +173,8 @@ async function processJob(job: Job): Promise<{ vehicles: number; recalls: number
 
 async function main() {
   await trackRun('recalls', `${API}/recalls`, async () => {
-    let makes = MAINSTREAM;
+    const specialty = Object.values(SPECIALTY).flat();
+    let makes = MAKE_SET === 'specialty' ? specialty : MAKE_SET === 'all' ? [...MAINSTREAM, ...specialty] : MAINSTREAM;
 
     if (process.env.RECALL_ALL_MAKES === '1') {
       const found = new Set<string>();
@@ -147,7 +188,10 @@ async function main() {
 
     const jobs: Job[] = [];
     for (let y = START_YEAR; y <= END_YEAR; y++) {
-      for (const make of makes) jobs.push({ year: y, make });
+      for (const make of makes) {
+        if (categoryOf(make) !== 'car' && y < SPECIALTY_START_YEAR) continue;
+        jobs.push({ year: y, make });
+      }
     }
     console.log(`[+] ${jobs.length.toLocaleString()} make/year combinations to walk`);
 

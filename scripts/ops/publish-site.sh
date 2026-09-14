@@ -41,6 +41,9 @@ cleanup() { pkill -f "next start -p $PORT" 2>/dev/null || true; }
 trap cleanup EXIT
 
 echo "==> Building the app with the production origin baked in"
+# unstable_cache entries survive a rebuild on disk; a stale make or model list
+# turns every hub added since the last publish into a 404 during the crawl.
+rm -rf .next/cache
 npm run build
 
 echo "==> Starting a local server to render from"

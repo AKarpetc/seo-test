@@ -31,13 +31,15 @@ const SECTIONS: Record<string, { what: string; source: string; caveat: string }>
   },
   recalls: {
     what:
-      'Every NHTSA safety recall on mainstream passenger vehicles from 2000 onward, readable three ' +
+      'Every NHTSA safety recall on mainstream passenger vehicles from 2000 onward, and on RVs, ' +
+      'motorcycles, powersports and trailers from 2010, readable three ' +
       'ways: by year, make and model; by model across all its years; and by recall campaign, ' +
       'listing every vehicle that campaign covers.',
     source: 'The National Highway Traffic Safety Administration, the US federal vehicle safety regulator.',
     caveat:
       'A recall covers a range of VINs, not every vehicle of a model. Only your own 17-character ' +
-      'VIN, checked against NHTSA, tells you whether a particular car is affected.',
+      'VIN, checked against NHTSA, tells you whether a particular vehicle is affected. Owner ' +
+      'complaints and NCAP crash-test ratings come from the same agency.',
   },
 };
 

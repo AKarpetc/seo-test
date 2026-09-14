@@ -165,19 +165,19 @@ export default async function CampaignPage({ params }: Props) {
       </section>
 
       <section className="mt-10">
-        <SectionHeading>Is my car affected?</SectionHeading>
+        <SectionHeading>Is my vehicle affected?</SectionHeading>
         <Prose className="space-y-4">
           <p>
             Being on this list means your year, make and model fall inside campaign {number}. It does
-            not mean your individual car does: a campaign covers a range of VINs built in a specific
-            window, and cars either side of that window are untouched.
+            not mean your individual vehicle does: a campaign covers a range of VINs built in a specific
+            window, and vehicles either side of that window are untouched.
           </p>
           <p>
             Check the 17-character VIN from the driver-side dashboard or door jamb against{' '}
             <a href="https://www.nhtsa.gov/recalls" rel="nofollow noopener" target="_blank" className="text-accent hover:underline">
               NHTSA&apos;s lookup
             </a>
-            . If it is covered, the dealer must do the work free of charge, regardless of the car&apos;s
+            . If it is covered, the dealer must do the work free of charge, regardless of the vehicle&apos;s
             age or mileage.
           </p>
         </Prose>

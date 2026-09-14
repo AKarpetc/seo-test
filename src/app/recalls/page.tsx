@@ -4,6 +4,7 @@ import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { DATASETS } from '@/lib/datasets';
 import { absoluteUrl, formatNumber, slugify } from '@/lib/site';
+import { CATEGORIES } from '@/lib/recalls';
 import { Page, Card, Breadcrumbs, PageHeader, EmptyState, JsonLd, SectionHeading } from '@/components/Layout';
 import { DirectoryTable } from '@/components/Directory';
 
@@ -25,9 +26,9 @@ const getSummary = unstable_cache(
     Promise.all([
       prisma.vehicle.count(),
       prisma.vehicle.groupBy({
-        by: ['make'],
+        by: ['category', 'make'],
         _count: { _all: true },
-        orderBy: { _count: { make: 'desc' } },
+        orderBy: [{ category: 'asc' }, { _count: { make: 'desc' } }],
       }),
       prisma.vehicle.findMany({
         select: { slug: true, modelYear: true, make: true, model: true, recallCount: true },
@@ -58,27 +59,33 @@ export default async function RecallsIndex() {
       <PageHeader
         eyebrow={config.source}
         title={config.title}
-        subtitle={`${formatNumber(total)} vehicles with open safety recalls. Recall repairs are always free, with no mileage or age limit.`}
+        subtitle={`${formatNumber(total)} cars, RVs, motorcycles and trailers with open safety recalls. Recall repairs are always free, with no mileage or age limit.`}
       />
 
-      <section className="mb-10">
-        <SectionHeading id="makes">Browse by make</SectionHeading>
-        <Card className="p-5 sm:p-6">
-          <ul className="grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3 lg:grid-cols-4">
-            {byMake.map((m) => (
-              <li key={m.make}>
-                <Link
-                  href={`/recalls/make/${slugify(m.make)}`}
-                  className="inline-flex min-h-11 items-center gap-1.5 text-accent hover:underline"
-                >
-                  {m.make}
-                  <span className="text-xs text-faint">({formatNumber(m._count._all)})</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      </section>
+      {CATEGORIES.map((category) => {
+        const makes = byMake.filter((m) => m.category === category.key);
+        if (makes.length === 0) return null;
+        return (
+          <section key={category.key} className="mb-10">
+            <SectionHeading id={category.key}>{category.label}</SectionHeading>
+            <Card className="p-5 sm:p-6">
+              <ul className="grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3 lg:grid-cols-4">
+                {makes.map((m) => (
+                  <li key={m.make}>
+                    <Link
+                      href={`/recalls/make/${slugify(m.make)}`}
+                      className="inline-flex min-h-11 items-center gap-1.5 text-accent hover:underline"
+                    >
+                      {m.make}
+                      <span className="text-xs text-faint">({formatNumber(m._count._all)})</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          </section>
+        );
+      })}
 
       <SectionHeading id="worst">Most recalled vehicles</SectionHeading>
       <DirectoryTable

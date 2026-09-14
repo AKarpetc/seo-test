@@ -319,6 +319,8 @@ model ZipClimate {
   population    Int?
   stationId     String? // nearest ClimateData station
   stationMiles  Float?
+  snowStationId    String? // nearest station that actually reports snowfall
+  snowStationMiles Float?
   slug          String   @unique
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -347,6 +349,10 @@ model ClimateData {
   firstFrostDate String? // "October 15"
   lastFrostDate  String? // "April 12"
   growingDays    Int?
+  firstSnowDate  String? // "November 4" — median first measurable snow, GHCN-daily 1991–2020
+  lastSnowDate   String? // "April 2"
+  snowSeasons    Int? // seasons with usable snow observations
+  snowySeasons   Int? // of those, seasons that saw measurable snow
   slug           String   @unique
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -476,20 +482,36 @@ model BusinessEntity {
 // ----------------------------------------------------
 
 model Vehicle {
-  id          Int             @id @default(autoincrement())
-  modelYear   Int
-  make        String
-  model       String
-  recallCount Int             @default(0)
-  slug        String          @unique // "2015-honda-accord-recalls"
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  recalls     VehicleRecall[]
+  id                 Int             @id @default(autoincrement())
+  modelYear          Int
+  make               String
+  model              String
+  category           String          @default("car") // car | motorcycle | rv | trailer
+  recallCount        Int             @default(0)
+  // Owner complaints filed with NHTSA for this exact year, make and model.
+  complaintCount     Int             @default(0)
+  crashCount         Int             @default(0)
+  fireCount          Int             @default(0)
+  injuryCount        Int             @default(0)
+  deathCount         Int             @default(0)
+  topComponents      String? // JSON: [{ "component": "ENGINE", "count": 12 }, ...]
+  // NCAP crash-test stars, 1–5; null where NHTSA has not tested the vehicle.
+  overallRating      Int?
+  frontalRating      Int?
+  sideRating         Int?
+  rolloverRating     Int?
+  complaintsLoadedAt DateTime?
+  ratingsLoadedAt    DateTime?
+  slug               String          @unique // "2015-honda-accord-recalls"
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  recalls            VehicleRecall[]
 
   @@unique([modelYear, make, model])
   @@index([make, model])
   @@index([modelYear])
   @@index([recallCount])
+  @@index([category])
 }
 
 model VehicleRecall {
