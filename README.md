@@ -40,6 +40,12 @@ npm run load:executives
 npm run load:demographics      # needs CENSUS_API_KEY
 npm run load:energy            # needs EIA_API_KEY
 
+npm run load:recalls                          # passenger cars, 2000 onward
+RECALL_MAKES=specialty npm run load:recalls   # RVs, motorcycles, powersports, trailers, 2010 onward
+npm run load:complaints        # NHTSA owner complaints + NCAP ratings onto every vehicle row
+npm run load:zipclimate        # frost dates by ZIP
+npm run load:snow              # first/last snow per station from GHCN-daily (streams 3.7 GB)
+
 npm run aggregates             # materialise specialty x city pages
 npm run status                 # row counts and ingestion history
 ```

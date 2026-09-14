@@ -14,6 +14,10 @@ Checked 2026-09-13 against live endpoints.
 | Foods | 13,824 | USDA FoodData Central CSV | Open, no key | Twice yearly |
 | Public companies | 10,426 | SEC `company_tickers.json` + Financial Statement Data Sets | Open, **contact in user agent required** | Quarterly |
 
+| Vehicle recalls | ~8,100 vehicles | NHTSA recalls API | Open, no key; "no recalls" arrives as HTTP 400 | Nightly |
+| Owner complaints, NCAP ratings | per vehicle | NHTSA complaints + SafetyRatings APIs | Open, no key | Monthly |
+| First/last snow dates | per station | GHCN-daily `ghcnd_all.tar.gz` (3.7 GB, streamed) | Open, no key | Yearly |
+
 ## Blocked — need a credential
 
 | Dataset | Source | What is needed | Effort |
