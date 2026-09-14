@@ -74,7 +74,8 @@ docker compose up -d --build   # full stack
 - [Architecture](docs/ARCHITECTURE.md) — layers, data model decisions, rejected approaches
 - [Data sources](docs/DATA_SOURCES.md) — what is loaded, what is blocked, endpoint changes
 - [Deploying to AWS](docs/DEPLOY.md) — CloudFormation stacks, costs, post-deploy checklist
-- **[Что осталось сделать вам](docs/ОСТАЛОСЬ_МНЕ.md)** — текущий план, начните отсюда
+- **[HANDOFF.md](docs/HANDOFF.md)** — состояние проекта одним документом, начните отсюда
+- [Что осталось сделать вам](docs/ОСТАЛОСЬ_МНЕ.md) — чеклист владельца
 - [Как получить API-ключи](docs/API_KEYS.md)
 - [Анализ прибыльности](docs/АНАЛИЗ_ПРИБЫЛЬНОСТИ.md) — честная оценка, с источниками
 - [Прогноз дохода и масштабирование](docs/ПРОГНОЗ_ДОХОДА.md)
