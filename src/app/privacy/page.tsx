@@ -18,7 +18,12 @@ const UPDATED = '14 September 2026';
 
 export default function PrivacyPage() {
   const adsEnabled = Boolean(process.env.NEXT_PUBLIC_ADSENSE_CLIENT);
-  const analyticsEnabled = Boolean(process.env.NEXT_PUBLIC_CF_BEACON_TOKEN);
+  // Analytics can arrive two ways — our own beacon, or Cloudflare injecting one at
+  // the edge — and the policy has to describe it either way. Whether we inject is
+  // our implementation detail; that visitors are counted is what they are told.
+  const analyticsEnabled =
+    Boolean(process.env.NEXT_PUBLIC_CF_BEACON_TOKEN) ||
+    process.env.NEXT_PUBLIC_ANALYTICS_ENABLED === '1';
   const contact = process.env.NEXT_PUBLIC_CONTACT_EMAIL;
 
   return (
