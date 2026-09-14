@@ -12,13 +12,13 @@ datasource db {
 // ----------------------------------------------------
 model Salary {
   id          Int      @id @default(autoincrement())
-  state       String   // "Texas"
-  city        String   // "Austin"
-  profession  String   // "Dental Assistant"
+  state       String // "Texas"
+  city        String // "Austin"
+  profession  String // "Dental Assistant"
   slug        String   @unique // "texas-austin-dental-assistant"
-  avgSalary   Int      // 45000
-  jobCount    Int      // 1200
-  description String?  // Optional AI generated text
+  avgSalary   Int // 45000
+  jobCount    Int // 1200
+  description String? // Optional AI generated text
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -29,18 +29,18 @@ model Salary {
 // Niche 2: Cars (Характеристики автомобилей)
 // ----------------------------------------------------
 model Car {
-  id           Int      @id @default(autoincrement())
-  make         String   // "Toyota"
-  model        String   // "Camry"
-  year         Int      // 2023
-  slug         String   @unique // "toyota-camry-2023"
-  engine       String?  // "2.5L 4-Cylinder"
-  horsepower   Int?     // 203
-  mpgCity      Int?
-  mpgHighway   Int?
-  description  String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  make        String // "Toyota"
+  model       String // "Camry"
+  year        Int // 2023
+  slug        String   @unique // "toyota-camry-2023"
+  engine      String? // "2.5L 4-Cylinder"
+  horsepower  Int? // 203
+  mpgCity     Int?
+  mpgHighway  Int?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([make, model])
 }
@@ -49,18 +49,464 @@ model Car {
 // Niche 3: Weather (Климат по городам)
 // ----------------------------------------------------
 model Weather {
-  id             Int      @id @default(autoincrement())
-  country        String   
-  state          String?
-  city           String
-  slug           String   @unique // "us-texas-austin"
-  avgTempHigh    Float
-  avgTempLow     Float
+  id              Int      @id @default(autoincrement())
+  country         String
+  state           String?
+  city            String
+  slug            String   @unique // "us-texas-austin"
+  avgTempHigh     Float
+  avgTempLow      Float
   rainDaysPerYear Int?
   bestTimeToVisit String?
-  description    String?
+  description     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([country, city])
+}
+
+// ----------------------------------------------------
+// Niche 4: Healthcare (NPI Doctors & Clinics)
+// ----------------------------------------------------
+model Doctor {
+  id           Int      @id @default(autoincrement())
+  npi          String   @unique
+  entityType   String   @default("1") // 1 = individual, 2 = organization
+  firstName    String?
+  lastName     String?
+  credential   String? // "MD", "DO", "NP"
+  clinicName   String?
+  specialty    String // Human readable NUCC taxonomy name
+  taxonomyCode String? // Raw NUCC code, e.g. "207X00000X"
+  address      String?
+  city         String
+  state        String
+  zip          String
+  phone        String?
+  slug         String   @unique // "dr-john-doe-cardiologist-austin-tx"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([state, city, specialty])
+  @@index([state, specialty])
+  @@index([specialty])
+  @@index([zip])
+}
+
+// ----------------------------------------------------
+// Niche 5: Real Estate Aggregates (Census / HUD Data)
+// ----------------------------------------------------
+model RealEstateLocation {
+  id                Int      @id @default(autoincrement())
+  city              String
+  state             String
+  zip               String
+  slug              String   @unique // "real-estate-austin-tx-78701"
+  avgHomePrice      Int?
+  avgPropertyTax    Int?
+  costOfLivingIndex Float?
+  population        Int?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([state, city])
+}
+
+// --- MEGA-SCALE DATA MODELS ---
+
+model BroadbandCoverage {
+  id             Int      @id @default(autoincrement())
+  zip            String   @unique
+  city           String?
+  state          String?
+  county         String?
+  providerCount  Int?
+  topProviders   String? // JSON array of provider names
+  maxSpeedDown   Int? // Mbps
+  maxSpeedUp     Int? // Mbps
+  fiberAvailable Boolean  @default(false)
+  cableAvailable Boolean  @default(false)
+  slug           String   @unique
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  @@index([country, city])
+  @@index([state, city])
+}
+
+model CensusDemographic {
+  id            Int      @id @default(autoincrement())
+  zip           String   @unique
+  city          String?
+  state         String?
+  population    Int?
+  households    Int?
+  medianIncome  Int?
+  medianAge     Float?
+  medianRent    Int?
+  homeValue     Int?
+  ownerOccupied Float? // percent
+  bachelorsPct  Float?
+  povertyPct    Float?
+  slug          String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([state, city])
+}
+
+model UtilityRate {
+  id             Int      @id @default(autoincrement())
+  utilityId      String   @unique
+  providerName   String
+  state          String
+  city           String?
+  ownership      String?
+  customers      Int?
+  avgKwhRate     Float? // cents per kWh, residential
+  commercialRate Float?
+  avgMonthlyBill Int?
+  avgMonthlyKwh  Int?
+  slug           String   @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([state, city])
+  @@index([providerName])
+}
+
+model BankBranch {
+  id            Int       @id @default(autoincrement())
+  uninum        String    @unique // FDIC unique office number
+  cert          String? // FDIC certificate of the parent institution
+  routingNumber String?
+  bankName      String
+  branchName    String?
+  address       String?
+  city          String?
+  state         String?
+  zip           String?
+  county        String?
+  lat           Float?
+  lng           Float?
+  established   DateTime?
+  slug          String    @unique
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([state, city])
+  @@index([bankName])
+  @@index([zip])
+}
+
+model SECExecutive {
+  id          Int      @id @default(autoincrement())
+  ticker      String   @unique
+  cik         String?
+  companyName String
+  exchange    String?
+  sic         String?
+  industry    String?
+  ceoName     String?
+  ceoSalary   BigInt?
+  totalComp   BigInt?
+  revenue     BigInt?
+  netIncome   BigInt?
+  employees   Int?
+  fiscalYear  Int?
+  slug        String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([companyName])
+  @@index([industry])
+}
+
+model DOTCarrier {
+  id               Int       @id @default(autoincrement())
+  dotNumber        String    @unique
+  companyName      String
+  dbaName          String?
+  fleetSize        Int? // power units
+  driverCount      Int?
+  safetyRating     String?
+  carrierOperation String?
+  cargoCarried     String?
+  // Date the authority was granted. Every new authority must file insurance within
+  // weeks, which makes recent entrants the commercially valuable slice of this table.
+  authorityDate    DateTime?
+  mcs150Date       DateTime?
+  phone            String?
+  address          String?
+  city             String?
+  state            String?
+  zip              String?
+  slug             String    @unique
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([state, city])
+  @@index([companyName])
+  @@index([authorityDate])
+}
+
+model Aircraft {
+  id            Int       @id @default(autoincrement())
+  nNumber       String    @unique
+  serialNumber  String?
+  manufacturer  String?
+  modelName     String?
+  yearBuilt     Int?
+  ownerName     String?
+  ownerType     String? // Individual, Corporation, Co-Owned, Government
+  aircraftType  String? // Fixed wing single engine, Rotorcraft, ...
+  engineType    String?
+  engineCount   Int?
+  seats         Int?
+  address       String?
+  city          String?
+  state         String?
+  zip           String?
+  statusCode    String?
+  certIssueDate DateTime?
+  slug          String    @unique
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([state, city])
+  @@index([manufacturer, modelName])
+}
+
+model FoodNutrition {
+  id          Int      @id @default(autoincrement())
+  fdcId       String   @unique
+  foodName    String
+  brandOwner  String?
+  category    String?
+  dataType    String?
+  servingSize Float?
+  servingUnit String?
+  calories    Float?
+  protein     Float?
+  fat         Float?
+  carbs       Float?
+  fiber       Float?
+  sugar       Float?
+  sodium      Float?
+  potassium   Float?
+  calcium     Float?
+  iron        Float?
+  slug        String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([foodName])
+}
+
+// USDA plant hardiness zone per ZIP, plus the nearest weather station.
+// Search demand runs on ZIP and zone ("frost date for zone 6b", "by zip code"),
+// while the underlying normals are published per station — this table joins them.
+model ZipClimate {
+  id            Int      @id @default(autoincrement())
+  zip           String   @unique
+  zone          String? // USDA hardiness zone, e.g. "8b"
+  zoneTempRange String? // "15 to 20" (F)
+  lat           Float?
+  lng           Float?
+  city          String?
+  state         String?
+  county        String?
+  population    Int?
+  stationId     String? // nearest ClimateData station
+  stationMiles  Float?
+  slug          String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([zone])
+  @@index([state, city])
+  @@index([stationId])
+}
+
+model ClimateData {
+  id             Int      @id @default(autoincrement())
+  stationId      String   @unique
+  stationName    String
+  city           String?
+  state          String?
+  lat            Float?
+  lng            Float?
+  elevation      Float?
+  avgTemp        Float? // annual mean, F
+  avgTempJan     Float?
+  avgTempJul     Float?
+  avgHighJul     Float?
+  avgLowJan      Float?
+  annualRainfall Float? // inches
+  annualSnowfall Float? // inches
+  firstFrostDate String? // "October 15"
+  lastFrostDate  String? // "April 12"
+  growingDays    Int?
+  slug           String   @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([state, city])
+}
+
+model Trademark {
+  id                 Int       @id @default(autoincrement())
+  serialNumber       String    @unique
+  registrationNumber String?
+  brandName          String
+  owner              String?
+  ownerCity          String?
+  ownerState         String?
+  status             String?
+  statusCode         String?
+  filingDate         DateTime?
+  registrationDate   DateTime?
+  goodsServices      String?
+  slug               String    @unique
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([brandName])
+  @@index([owner])
+}
+
+model GeoPoi {
+  id        Int      @id @default(autoincrement())
+  poiId     String   @unique
+  type      String // e.g., 'EV_CHARGER', 'DOG_PARK'
+  name      String
+  city      String
+  state     String
+  lat       Float
+  lng       Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ----------------------------------------------------
+// Aggregates: the real programmatic SEO money pages.
+// Pre-computed so a "Cardiologists in Austin, TX" page is
+// one indexed lookup instead of a GROUP BY over 8M rows.
+// ----------------------------------------------------
+
+model DoctorSpecialtyCity {
+  id            Int      @id @default(autoincrement())
+  specialty     String
+  taxonomyCode  String?
+  city          String
+  state         String
+  providerCount Int
+  slug          String   @unique // "cardiologists-in-austin-tx"
+  updatedAt     DateTime @updatedAt
+
+  @@unique([specialty, city, state])
+  @@index([state, city])
+  @@index([specialty])
+  @@index([providerCount])
+}
+
+model CarrierStateSummary {
+  id           Int      @id @default(autoincrement())
+  state        String   @unique
+  carrierCount Int
+  totalTrucks  Int?
+  totalDrivers Int?
+  slug         String   @unique
+  updatedAt    DateTime @updatedAt
+}
+
+// ----------------------------------------------------
+// ETL bookkeeping: which dataset was loaded, when, how many rows.
+// Drives the /status page and makes re-runs idempotent.
+// ----------------------------------------------------
+
+model IngestionRun {
+  id          Int       @id @default(autoincrement())
+  dataset     String // "doctors", "aircraft", ...
+  source      String // upstream URL or s3:// key
+  status      String // "running" | "success" | "failed"
+  rowsRead    Int       @default(0)
+  rowsWritten Int       @default(0)
+  errorText   String?
+  startedAt   DateTime  @default(now())
+  finishedAt  DateTime?
+
+  @@index([dataset, startedAt])
+}
+
+// ----------------------------------------------------
+// Newly registered business entities from Secretary of State registries.
+// The saleable slice is the recent filings: a business that formed this month
+// has not yet bought insurance, payroll, banking or a POS system.
+// ----------------------------------------------------
+
+model BusinessEntity {
+  id         Int       @id @default(autoincrement())
+  entityKey  String    @unique // "CO-20268142409" — state scoped, ids collide across states
+  stateId    String // filing id as issued by the state
+  state      String
+  name       String
+  entityType String?
+  status     String?
+  filingDate DateTime?
+  address    String?
+  city       String?
+  zip        String?
+  county     String?
+  agentName  String?
+  slug       String    @unique
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([state, filingDate])
+  @@index([filingDate])
+  @@index([state, city])
+  @@index([name])
+}
+
+// ----------------------------------------------------
+// NHTSA safety recalls, keyed by model year + make + model.
+// One page per vehicle answers "is my car recalled", which is the
+// query with volume; the recall rows hang off it.
+// ----------------------------------------------------
+
+model Vehicle {
+  id          Int             @id @default(autoincrement())
+  modelYear   Int
+  make        String
+  model       String
+  recallCount Int             @default(0)
+  slug        String          @unique // "2015-honda-accord-recalls"
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  recalls     VehicleRecall[]
+
+  @@unique([modelYear, make, model])
+  @@index([make, model])
+  @@index([modelYear])
+  @@index([recallCount])
+}
+
+model VehicleRecall {
+  id             Int       @id @default(autoincrement())
+  campaignNumber String
+  vehicleId      Int
+  vehicle        Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  component      String?
+  summary        String?
+  consequence    String?
+  remedy         String?
+  notes          String?
+  manufacturer   String?
+  reportDate     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([campaignNumber, vehicleId])
+  @@index([vehicleId])
 }
