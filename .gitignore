@@ -40,3 +40,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 tmp/
+
+# logs
+/logs/
+
+# local data exports
+/exports/
+
+# generated static sites
+/static/

@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: RDS PostgreSQL for the programmatic SEO platform.
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: seo-platform
+  DbInstanceClass:
+    Type: String
+    Default: db.t4g.large
+    Description: t4g.large holds the doctor and carrier indexes in memory; t4g.medium is the cheaper floor.
+  DbAllocatedStorage:
+    Type: Number
+    Default: 200
+    MinValue: 100
+    Description: GiB of gp3 storage. 10M rows plus indexes need roughly 40 GiB; the rest is headroom.
+  DbUsername:
+    Type: String
+    Default: seo_user
+  DbPassword:
+    Type: String
+    NoEcho: true
+    MinLength: 16
+    Description: Master password. Generate one and store it in your password manager.
+  MultiAz:
+    Type: String
+    Default: 'false'
+    AllowedValues: ['true', 'false']
+
+Resources:
+  DbSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Private subnets for the database
+      SubnetIds: !Split [',', !ImportValue { 'Fn::Sub': '${ProjectName}-PrivateSubnets' }]
+
+  DbParameterGroup:
+    Type: AWS::RDS::DBParameterGroup
+    Properties:
+      Description: Read-mostly directory workload
+      Family: postgres16
+      Parameters:
+        # Index-heavy lookups over large tables; SSD storage makes random reads cheap.
+        random_page_cost: '1.1'
+        work_mem: '32768'
+        maintenance_work_mem: '524288'
+        effective_cache_size: '{DBInstanceClassMemory/16384}'
+        log_min_duration_statement: '2000'
+
+  Database:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Snapshot
+    UpdateReplacePolicy: Snapshot
+    Properties:
+      DBInstanceIdentifier: !Sub '${ProjectName}-db'
+      Engine: postgres
+      EngineVersion: '16.4'
+      DBInstanceClass: !Ref DbInstanceClass
+      AllocatedStorage: !Ref DbAllocatedStorage
+      MaxAllocatedStorage: 1000
+      StorageType: gp3
+      StorageEncrypted: true
+      MasterUsername: !Ref DbUsername
+      MasterUserPassword: !Ref DbPassword
+      DBName: seo_db
+      DBSubnetGroupName: !Ref DbSubnetGroup
+      DBParameterGroupName: !Ref DbParameterGroup
+      VPCSecurityGroups:
+        - !ImportValue { 'Fn::Sub': '${ProjectName}-DbSg' }
+      MultiAZ: !Ref MultiAz
+      PubliclyAccessible: false
+      BackupRetentionPeriod: 7
+      PreferredBackupWindow: '07:00-08:00'
+      PreferredMaintenanceWindow: 'sun:08:30-sun:09:30'
+      EnablePerformanceInsights: true
+      PerformanceInsightsRetentionPeriod: 7
+      AutoMinorVersionUpgrade: true
+      DeletionProtection: true
+      Tags: [{ Key: Name, Value: !Sub '${ProjectName}-db' }]
+
+Outputs:
+  DbEndpoint:
+    Value: !GetAtt Database.Endpoint.Address
+    Export: { Name: !Sub '${ProjectName}-DbEndpoint' }
+  DbPort:
+    Value: !GetAtt Database.Endpoint.Port
+    Export: { Name: !Sub '${ProjectName}-DbPort' }
