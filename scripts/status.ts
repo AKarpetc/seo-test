@@ -1,6 +1,56 @@
 import { prisma } from './lib/etl';
 
 /** Prints what is loaded and when each dataset last ran. */
+/**
+ * The published sites, checked over the network.
+ *
+ * The row counts above say what is in the database, which is not the same as
+ * what readers can see. Between the two sits a build, a deploy and a DNS record,
+ * and every one of them has been wrong at least once. This asks the live domain.
+ */
+const SITES = [
+  { name: 'frostdatefinder.com', probe: '/frost' },
+  { name: 'checkcarrecalls.com', probe: '/recalls' },
+];
+
+const BROWSER_UA =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 ' +
+  '(KHTML, like Gecko) Chrome/140.0 Safari/537.36';
+
+async function fetchText(url: string): Promise<{ status: number; body: string } | null> {
+  try {
+    const res = await fetch(url, { headers: { 'User-Agent': BROWSER_UA }, redirect: 'manual' });
+    return { status: res.status, body: await res.text() };
+  } catch {
+    return null;
+  }
+}
+
+async function reportLiveSites(): Promise<void> {
+  console.log('Published sites');
+  console.log('-'.repeat(78));
+
+  for (const site of SITES) {
+    const page = await fetchText(`https://${site.name}${site.probe}`);
+    if (!page) {
+      console.log(`  ${site.name.padEnd(24)} unreachable`);
+      continue;
+    }
+
+    const sitemap = await fetchText(`https://${site.name}/sitemap.xml`);
+    const urls = sitemap ? (sitemap.body.match(/<loc>/g) ?? []).length : 0;
+    const analytics = /beacon\.min\.js|cloudflareinsights/.test(page.body);
+    const ads = /adsbygoogle|googlesyndication/.test(page.body);
+
+    console.log(
+      `  ${site.name.padEnd(24)} HTTP ${page.status}  ` +
+        `${urls.toLocaleString().padStart(7)} URLs in sitemap  ` +
+        `analytics ${analytics ? 'on ' : 'off'}  ads ${ads ? 'on' : 'off'}`,
+    );
+  }
+  console.log('');
+}
+
 async function main() {
   const counts: [string, number][] = [
     ['Doctor', await prisma.doctor.count()],
@@ -43,6 +93,7 @@ async function main() {
   }
   console.log('');
   await prisma.$disconnect();
+  await reportLiveSites();
 }
 
 main();
