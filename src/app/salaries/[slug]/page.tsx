@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
@@ -60,7 +61,7 @@ export default async function SalaryPage({ params }: Props) {
           </p>
           
           <div className="mt-12 pt-8 border-t border-slate-100">
-            <a href="/" className="text-emerald-600 font-semibold hover:underline">← Back to Directory</a>
+            <Link href="/" className="text-emerald-600 font-semibold hover:underline">← Back to Directory</Link>
           </div>
         </div>
       </div>
