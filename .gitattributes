@@ -1,0 +1,2 @@
+# RFC 5545 requires CRLF; normalising this file breaks strict parsers.
+*.ics -text
