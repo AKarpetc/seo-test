@@ -2,7 +2,8 @@
 
 One indexable page per record, built from US federal open data. 12.5 million rows across
 nine live directories: doctors, motor carriers, aircraft, bank branches, weather stations,
-foods, public companies, ZIP-code demographics and state electricity rates.
+foods, public companies, ZIP-code demographics and state electricity rates. Three sections
+are published as their own sites: frost dates by ZIP, vehicle recalls, and storm history by city.
 
 **Read [АНАЛИЗ_ПРИБЫЛЬНОСТИ.md](docs/АНАЛИЗ_ПРИБЫЛЬНОСТИ.md) before investing more in the
 SEO side.** The short version: restating a federal registry is what Google's scaled
@@ -45,6 +46,7 @@ RECALL_MAKES=specialty npm run load:recalls   # RVs, motorcycles, powersports, t
 npm run load:complaints        # NHTSA owner complaints + NCAP ratings onto every vehicle row
 npm run load:zipclimate        # frost dates by ZIP
 npm run load:snow              # first/last snow per station from GHCN-daily (streams 3.7 GB)
+npm run load:storms            # NHC hurricane tracks + SPC tornadoes, matched to cities (~2 min)
 
 npm run aggregates             # materialise specialty x city pages
 npm run status                 # row counts and ingestion history

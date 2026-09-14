@@ -16,6 +16,7 @@ Checked 2026-09-13 against live endpoints.
 
 | Vehicle recalls | ~8,100 vehicles | NHTSA recalls API | Open, no key; "no recalls" arrives as HTTP 400 | Nightly |
 | Owner complaints, NCAP ratings | per vehicle | NHTSA complaints + SafetyRatings APIs | Open, no key | Monthly |
+| Storm history | 3,266 tropical cyclones, 71,813 tornadoes, 13,644 cities | NHC HURDAT2 (Atlantic + NE Pacific) + SPC tornado CSV | Open, no key | Yearly, after each season's re-analysis |
 | First/last snow dates | per station | GHCN-daily `ghcnd_all.tar.gz` (3.7 GB, streamed) | Open, no key | Yearly |
 
 ## Blocked — need a credential

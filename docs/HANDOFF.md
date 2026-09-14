@@ -36,15 +36,36 @@
 | FoodNutrition | 13 824 | нет |
 | SECExecutive | 10 426 | нет |
 | Vehicle / VehicleRecall | 8 862 / 33 040 | **да** |
+| Storm / Tornado / StormCity | 3 266 / 71 813 / 13 644 | **да** |
 | UtilityRate | 51 | нет |
 | BroadbandCoverage, Trademark | 0 | заблокированы ключами |
 
-### Два сайта выложены и живут
+### Три сайта выложены
 
 | Сайт | Домен | Страниц | Проект Cloudflare |
 |---|---|---:|---|
 | Заморозки по ZIP | `frostdatefinder.com` | 18 689 | `frost-date-finder` |
 | Отзывы авто | `checkcarrecalls.com` | 18 613 | `check-car-recalls` |
+| Штормы по городу | `stormsthathit.com` | 14 441 | `storms-that-hit` |
+
+**Штормы — третий домен, запущен 14.09.2026** по итогам третьей проверки ниш
+(см. КУДА_РАСШИРЯТЬСЯ.md). Одна страница на город: все тропические циклоны,
+чей трек прошёл в 75 милях с 1851 года, и все торнадо в 25 милях с 1950-го.
+Данные: HURDAT2 NHC (Атлантика и восточная часть Тихого океана) и база SPC,
+оба без ключа, `npm run load:storms` за две минуты. Расстояние считается
+до отрезка трека, а не до шестичасовых точек — иначе быстрый шторм проскакивает
+город между отметками. Таблицы `Storm`, `StormPoint`, `Tornado`, `StormCity`,
+`CityStorm`, `CityTornado`; 3 266 штормов, 71 813 торнадо, 13 644 города,
+268 077 связей город–шторм и 970 678 город–торнадо.
+
+Маршруты: `/storms/[город-штат]`, `/storms/state/[штат]`, `/storms/hurricane/[имя-год]`
+(741 шторм, у которых есть хоть один город). Домен: привязан к проекту через API 14.09.2026,
+статус `pending` — токен не видит DNS-зону, CNAME-записи надо добавить владельцу
+(см. «Что осталось — по владельцу»). Предпросмотр живёт на
+`storms-that-hit.pages.dev`, canonical уже указывает на `stormsthathit.com`.
+Первая выкладка: 14 476 файлов, запас 5 524. IndexNow ответил 403
+`SiteVerificationNotCompleted` — как и в прошлый раз, повторить через 5–10 минут:
+`npm run indexnow -- --dir static/storms --host stormsthathit.com`.
 
 Выложены 14.09.2026 на Cloudflare Pages. Домены привязаны вместе с `www`,
 сертификаты выпущены. Проверено на живых адресах: страницы отдаются `200`
@@ -137,6 +158,15 @@ Recalls выложен заново тем же вечером: 18 613 стра�
 ---
 
 ## Что осталось — по владельцу
+
+0. **DNS для stormsthathit.com.** Домен привязан к проекту Pages, но записей
+   в зоне нет: токен агента не имеет прав на DNS. В панели Cloudflare → домен
+   `stormsthathit.com` → DNS → добавить две записи CNAME, обе с прокси:
+   `@` → `storms-that-hit.pages.dev` и `www` → `storms-that-hit.pages.dev`.
+   Либо Workers & Pages → `storms-that-hit` → Custom domains — там Cloudflare
+   предложит создать записи сам. После этого сертификат выпустится за минуты.
+   Затем Search Console: добавить ресурс типа Domain и отправить
+   `https://stormsthathit.com/sitemap.xml`.
 
 1. **Залить репозиторий на GitHub.** Remote уже добавлен
    (`git@github.com:AKarpetc/seo-test.git`), ветка `main`, репозиторий на GitHub
@@ -390,6 +420,8 @@ npm run publish -- frost --dry-run
 
 npm run load:zipclimate           # заморозки по ZIP
 npm run load:snow                 # первый/последний снег из GHCN-daily (~12 мин, 3,7 ГБ потоком)
+npm run load:storms               # ураганы NHC + торнадо SPC по городам (~2 мин)
+npm run publish -- storms         # выложить stormsthathit.com
 npm run load:recalls              # отзывы авто (~70 мин)
 RECALL_MAKES=specialty RECALL_CONCURRENCY=4 npm run load:recalls   # RV, мото, прицепы
 COMPLAINT_CONCURRENCY=4 npm run load:complaints                    # жалобы + рейтинги (~1,5 ч)
