@@ -2,8 +2,12 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
-import { absoluteUrl, formatNumber, stateName } from '@/lib/site';
-import { Page, Card, Stat, Breadcrumbs, PageHeader, JsonLd } from '@/components/Layout';
+import { absoluteUrl, stateName } from '@/lib/site';
+import { plantingCalendar, frostSummary } from '@/lib/planting';
+import {
+  Page, Card, Stat, Breadcrumbs, PageHeader, JsonLd, AnswerBox, Prose, SectionHeading,
+} from '@/components/Layout';
+import { ShareBar } from '@/components/Share';
 
 export const revalidate = 86400;
 
@@ -38,6 +42,9 @@ export default async function ZipFrostPage({ params }: Props) {
 
   const { zip, station } = data;
   const place = zip.city ? `${zip.city}, ${stateName(zip.state)}` : `ZIP ${zip.zip}`;
+  const calendar = plantingCalendar(station?.lastFrostDate, station?.firstFrostDate);
+  const summary = frostSummary(station?.lastFrostDate, station?.firstFrostDate, station?.growingDays);
+  const shareTitle = `Frost dates for ${zip.zip} — ${place}`;
 
   const nearby = zip.state
     ? await prisma.zipClimate.findMany({
@@ -65,19 +72,63 @@ export default async function ZipFrostPage({ params }: Props) {
       <PageHeader
         eyebrow={zip.zone ? `USDA Hardiness Zone ${zip.zone}` : 'NOAA Climate Normals'}
         title={`Frost Dates for ${zip.zip} — ${place}`}
-        subtitle={station ? `Based on ${station.stationName}, the nearest reporting station (${zip.stationMiles} miles away).` : undefined}
+        subtitle={station ? `Averages from ${station.stationName}, the nearest reporting station, ${zip.stationMiles} miles away.` : undefined}
       />
 
-      <Card className="p-6 sm:p-8">
-        <dl className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Stat label="Last Spring Frost" value={station?.lastFrostDate || '—'} hint="50% probability" />
-          <Stat label="First Fall Frost" value={station?.firstFrostDate || '—'} hint="50% probability" />
-          <Stat label="Growing Season" value={station?.growingDays ? `${station.growingDays} days` : '—'} />
-          <Stat label="Hardiness Zone" value={zip.zone || '—'} hint={zip.zoneTempRange ? `${zip.zoneTempRange}°F annual low` : undefined} />
-        </dl>
+      {summary ? (
+        <AnswerBox>
+          <p>
+            <strong>{summary}</strong>
+          </p>
+        </AnswerBox>
+      ) : null}
 
-        <div className="mt-8 prose prose-slate max-w-none text-slate-600">
-          <h2 className="text-lg font-bold text-slate-900">When to plant in {zip.zip}</h2>
+      <dl className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat label="Last spring frost" value={station?.lastFrostDate || '—'} hint="50% probability" />
+        <Stat label="First fall frost" value={station?.firstFrostDate || '—'} hint="50% probability" />
+        <Stat label="Growing season" value={station?.growingDays ? `${station.growingDays} days` : '—'} hint="frost-free" />
+        <Stat label="Hardiness zone" value={zip.zone || '—'} hint={zip.zoneTempRange ? `${zip.zoneTempRange}°F annual low` : undefined} />
+      </dl>
+
+      <div className="mt-6">
+        <ShareBar title={shareTitle} summary={summary ?? undefined} />
+      </div>
+
+      {calendar.length > 0 ? (
+        <section className="mt-10">
+          <SectionHeading id="calendar">Planting calendar for {zip.zip}</SectionHeading>
+          <Card className="overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-left text-sm">
+                <caption className="sr-only">
+                  What to do and when, based on the frost normals for {place}
+                </caption>
+                <thead className="bg-sunk">
+                  <tr>
+                    <th scope="col" className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-faint">When</th>
+                    <th scope="col" className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-faint">What to do</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-edge">
+                  {calendar.map((task) => (
+                    <tr key={task.what}>
+                      <td className="whitespace-nowrap px-4 py-4 align-top font-semibold text-fg">{task.window}</td>
+                      <td className="px-4 py-4">
+                        <p className="font-medium text-fg">{task.what}</p>
+                        <p className="mt-0.5 text-muted">{task.why}</p>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </section>
+      ) : null}
+
+      <section className="mt-10">
+        <SectionHeading id="explanation">What these dates mean</SectionHeading>
+        <Prose className="space-y-4">
           {station?.lastFrostDate && station.firstFrostDate ? (
             <p>
               Wait until after <strong>{station.lastFrostDate}</strong> to put tender plants — tomatoes,
@@ -88,7 +139,7 @@ export default async function ZipFrostPage({ params }: Props) {
           ) : (
             <p>
               The nearest reporting station does not publish frost probability normals. Use the
-              hardiness zone below as a rough guide, or check a neighbouring ZIP code.
+              hardiness zone as a rough guide, or check a neighbouring ZIP code below.
             </p>
           )}
           {zip.zone ? (
@@ -96,36 +147,38 @@ export default async function ZipFrostPage({ params }: Props) {
               ZIP {zip.zip} sits in <strong>USDA hardiness zone {zip.zone}</strong>
               {zip.zoneTempRange ? `, meaning the average coldest night of the year falls between ${zip.zoneTempRange}°F` : ''}.
               Zone decides what survives the winter; frost dates decide when to plant each spring.
-              They are different questions and a plant can pass one and fail the other.
+              They are different questions, and a plant can pass one and fail the other.
             </p>
           ) : null}
-          <p className="text-sm">
+          <p className="rounded-xl border border-warn/30 bg-warn-sunk p-4 text-[0.95rem]">
             These are thirty-year NOAA averages for 1991–2020, not a forecast. Any individual year
-            can frost two to three weeks either side of these dates, so watch the actual forecast
+            can frost two to three weeks either side of these dates, so check the actual forecast
             before planting out.
           </p>
-        </div>
-      </Card>
+        </Prose>
+      </section>
 
       {nearby.length > 0 ? (
         <section className="mt-10">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">
-            Other zone {zip.zone} ZIP codes in {stateName(zip.state)}
-          </h2>
-          <Card className="p-6">
-            <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-y-2 gap-x-4">
+          <SectionHeading>Other zone {zip.zone} ZIP codes in {stateName(zip.state)}</SectionHeading>
+          <Card className="p-5 sm:p-6">
+            <ul className="grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3 lg:grid-cols-4">
               {nearby.map((n) => (
                 <li key={n.slug}>
-                  <Link href={`/frost/${n.slug}`} className="text-blue-600 hover:underline">
+                  <Link href={`/frost/${n.slug}`} className="inline-flex min-h-11 items-center gap-2 text-accent hover:underline">
                     {n.zip}
+                    {n.city ? <span className="text-xs text-faint">{n.city}</span> : null}
                   </Link>
-                  {n.city ? <span className="text-slate-400 text-xs ml-1">{n.city}</span> : null}
                 </li>
               ))}
             </ul>
           </Card>
         </section>
       ) : null}
+
+      <div className="mt-10 border-t border-edge pt-6">
+        <ShareBar title={shareTitle} summary={summary ?? undefined} />
+      </div>
     </Page>
   );
 }

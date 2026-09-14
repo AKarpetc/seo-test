@@ -22,7 +22,10 @@ const SECTION_NAV: Record<string, NavLink[]> = {
     { href: '/frost', label: 'By ZIP code' },
     { href: '/frost/zone/7b', label: 'By zone' },
   ],
-  recalls: [{ href: '/recalls', label: 'All recalls' }],
+  recalls: [
+    { href: '/recalls', label: 'All recalls' },
+    { href: '/recalls/make/toyota', label: 'By make' },
+  ],
 };
 
 const FULL_NAV: NavLink[] = [
@@ -81,3 +84,14 @@ export function formatPhone(v: string | null | undefined): string | null {
   if (d.length === 10) return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
   return v;
 }
+
+/** URL-safe slug from free text. Used for make and model hub routes. */
+export function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/** NHTSA's public vehicle safety hotline, the one number every recall page needs. */
+export const NHTSA_HOTLINE = '1-888-327-4236';

@@ -39,11 +39,11 @@ export default async function Home() {
           <Link key={config.key} href={config.path} className="group block">
             <Card className="p-6 h-full transition-all hover:shadow-md hover:border-blue-400">
               <div className="flex items-baseline justify-between gap-3">
-                <h2 className="text-lg font-bold text-slate-900 group-hover:text-blue-600">{config.name}</h2>
-                <span className="text-sm font-mono text-slate-400">{formatNumber(count)}</span>
+                <h2 className="text-lg font-bold text-fg group-hover:text-accent">{config.name}</h2>
+                <span className="text-sm font-mono text-faint">{formatNumber(count)}</span>
               </div>
-              <p className="mt-2 text-sm text-slate-600">{config.description}</p>
-              <p className="mt-3 text-xs uppercase tracking-wide text-slate-400">{config.source}</p>
+              <p className="mt-2 text-sm text-muted">{config.description}</p>
+              <p className="mt-3 text-xs uppercase tracking-wide text-faint">{config.source}</p>
             </Card>
           </Link>
         ))}
@@ -51,13 +51,13 @@ export default async function Home() {
 
       {pending.length > 0 ? (
         <section className="mt-12">
-          <h2 className="text-lg font-bold text-slate-900 mb-3">In progress</h2>
-          <p className="text-sm text-slate-600 mb-4">
+          <h2 className="text-lg font-bold text-fg mb-3">In progress</h2>
+          <p className="text-sm text-muted mb-4">
             These directories are built but waiting on upstream access credentials.
           </p>
           <ul className="flex flex-wrap gap-2">
             {pending.map(({ config }) => (
-              <li key={config.key} className="text-sm bg-white border border-slate-200 rounded-full px-3 py-1.5 text-slate-500">
+              <li key={config.key} className="text-sm bg-white border border-edge rounded-full px-3 py-1.5 text-faint">
                 {config.name}
               </li>
             ))}

@@ -36,6 +36,11 @@ type Section = { root: string; paths: () => Promise<string[]> };
  */
 const MIN_ZIP_POPULATION = parseInt(process.env.FROST_MIN_POPULATION || '2000', 10);
 
+/** Mirrors slugify in src/lib/site.ts; the two must agree or the crawl 404s. */
+function slug(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
 const SECTIONS: Record<string, Section> = {
   frost: {
     root: '/frost',
@@ -71,8 +76,20 @@ const SECTIONS: Record<string, Section> = {
   recalls: {
     root: '/recalls',
     paths: async () => {
-      const rows = await prisma.vehicle.findMany({ select: { slug: true } });
-      return ['/recalls', ...rows.map((r) => `/recalls/${r.slug}`)];
+      const vehicles = await prisma.vehicle.findMany({ select: { slug: true, make: true, model: true } });
+      const campaigns = await prisma.vehicleRecall.findMany({
+        select: { campaignNumber: true },
+        distinct: ['campaignNumber'],
+      });
+      const makes = [...new Set(vehicles.map((v) => v.make))];
+      const models = [...new Set(vehicles.map((v) => `${v.make}-${v.model}`))];
+      return [
+        '/recalls',
+        ...makes.map((m) => `/recalls/make/${slug(m)}`),
+        ...models.map((m) => `/recalls/model/${slug(m)}`),
+        ...campaigns.map((c) => `/recalls/campaign/${c.campaignNumber.toLowerCase()}`),
+        ...vehicles.map((v) => `/recalls/${v.slug}`),
+      ];
     },
   },
   energy: {

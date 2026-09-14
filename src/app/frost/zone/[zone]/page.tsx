@@ -78,8 +78,8 @@ export default async function ZonePage({ params }: Props) {
           <Stat label="ZIP Codes" value={formatNumber(data.zips.length)} />
         </dl>
 
-        <div className="mt-8 prose prose-slate max-w-none text-slate-600">
-          <h2 className="text-lg font-bold text-slate-900">What zone {zone} actually tells you</h2>
+        <div className="mt-8 prose max-w-none text-muted">
+          <h2 className="text-lg font-bold text-fg">What zone {zone} actually tells you</h2>
           <p>
             A hardiness zone describes one thing: the average coldest night of the year
             {data.tempRange ? `, which in zone ${zone} falls between ${data.tempRange}°F` : ''}.
@@ -95,18 +95,18 @@ export default async function ZonePage({ params }: Props) {
       </Card>
 
       <section className="mt-10">
-        <h2 className="text-xl font-bold text-slate-900 mb-4">Zone {zone} ZIP codes by state</h2>
+        <h2 className="text-xl font-bold text-fg mb-4">Zone {zone} ZIP codes by state</h2>
         <div className="space-y-4">
           {[...byState.entries()].sort().map(([state, zips]) => (
             <Card key={state} className="p-5">
-              <h3 className="font-semibold text-slate-900 mb-2">{stateName(state)}</h3>
+              <h3 className="font-semibold text-fg mb-2">{stateName(state)}</h3>
               <ul className="flex flex-wrap gap-x-4 gap-y-1">
                 {zips.map((z) => (
                   <li key={z.slug}>
-                    <Link href={`/frost/${z.slug}`} className="text-blue-600 hover:underline text-sm">
+                    <Link href={`/frost/${z.slug}`} className="text-accent hover:underline text-sm">
                       {z.zip}
                     </Link>
-                    {z.city ? <span className="text-slate-400 text-xs ml-1">{z.city}</span> : null}
+                    {z.city ? <span className="text-faint text-xs ml-1">{z.city}</span> : null}
                   </li>
                 ))}
               </ul>

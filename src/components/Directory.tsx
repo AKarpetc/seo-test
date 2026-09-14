@@ -22,26 +22,26 @@ export function DirectoryTable({
   return (
     <Card className="overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-200 text-sm">
-          <thead className="bg-slate-50">
+        <table className="min-w-full divide-y divide-edge text-sm">
+          <thead className="bg-sunk">
             <tr>
               {headers.filter(Boolean).map((h) => (
-                <th key={h} scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                <th key={h} scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-faint">
                   {h}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-edge">
             {rows.map((r) => (
-              <tr key={r.slug} className="hover:bg-slate-50">
+              <tr key={r.slug} className="hover:bg-sunk">
                 <td className="px-4 py-3">
-                  <Link href={`${basePath}/${r.slug}`} className="text-blue-600 hover:underline font-medium">
+                  <Link href={`${basePath}/${r.slug}`} className="font-medium text-accent hover:underline">
                     {r.primary}
                   </Link>
                 </td>
-                {headers[1] ? <td className="px-4 py-3 text-slate-600">{r.secondary || '—'}</td> : null}
-                {headers[2] ? <td className="px-4 py-3 text-slate-600">{r.tertiary || '—'}</td> : null}
+                {headers[1] ? <td className="px-4 py-3 text-muted">{r.secondary || '—'}</td> : null}
+                {headers[2] ? <td className="px-4 py-3 text-muted">{r.tertiary || '—'}</td> : null}
               </tr>
             ))}
           </tbody>
@@ -61,16 +61,16 @@ export function GroupLinks({
   if (items.length === 0) return null;
   return (
     <section className="mb-10">
-      <h2 className="text-xl font-bold text-slate-900 mb-4">{title}</h2>
+      <h2 className="text-xl font-bold text-fg mb-4">{title}</h2>
       <Card className="p-6">
         <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-y-2 gap-x-4">
           {items.map((i) => (
             <li key={i.href}>
-              <Link href={i.href} className="text-blue-600 hover:underline">
+              <Link href={i.href} className="text-accent hover:underline">
                 {i.label}
               </Link>
               {i.count !== undefined ? (
-                <span className="text-slate-400 text-sm ml-1">({formatNumber(i.count)})</span>
+                <span className="text-faint text-sm ml-1">({formatNumber(i.count)})</span>
               ) : null}
             </li>
           ))}

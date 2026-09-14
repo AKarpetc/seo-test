@@ -2,8 +2,11 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
-import { absoluteUrl } from '@/lib/site';
-import { Page, Card, Breadcrumbs, PageHeader, JsonLd } from '@/components/Layout';
+import { absoluteUrl, slugify, NHTSA_HOTLINE } from '@/lib/site';
+import {
+  Page, Card, Breadcrumbs, PageHeader, JsonLd, AnswerBox, Prose, SectionHeading, CallLink,
+} from '@/components/Layout';
+import { ShareBar } from '@/components/Share';
 
 export const revalidate = 86400;
 
@@ -47,6 +50,9 @@ export default async function RecallPage({ params }: Props) {
   ]);
 
   const name = `${v.modelYear} ${v.make} ${v.model}`;
+  const plural = v.recallCount === 1 ? '' : 's';
+  const answer = `The ${name} has ${v.recallCount} NHTSA safety recall${plural} on file. Recall repairs are always free, whatever the car's age or mileage.`;
+  const modelHub = `/recalls/model/${slugify(`${v.make}-${v.model}`)}`;
 
   return (
     <Page>
@@ -56,92 +62,149 @@ export default async function RecallPage({ params }: Props) {
         model: v.model, vehicleModelDate: String(v.modelYear),
         url: absoluteUrl(`/recalls/${slug}`),
       }} />
-      <Breadcrumbs items={[{ label: 'Recalls', href: '/recalls' }, { label: name }]} />
-      <PageHeader
-        eyebrow="NHTSA Safety Recalls"
-        title={`${name} Recalls`}
-        subtitle={`${v.recallCount} recall${v.recallCount === 1 ? '' : 's'} on file. Recall repairs are free — a dealer cannot charge you for them, regardless of the car's age or mileage.`}
-      />
+      <Breadcrumbs items={[
+        { label: 'Recalls', href: '/recalls' },
+        { label: v.make, href: `/recalls/make/${slugify(v.make)}` },
+        { label: v.model, href: modelHub },
+        { label: String(v.modelYear) },
+      ]} />
+      <PageHeader eyebrow="NHTSA Safety Recalls" title={`${name} Recalls`} />
 
-      <div className="space-y-5">
-        {v.recalls.map((r) => (
-          <Card key={r.id} className="p-6">
-            <div className="flex flex-wrap items-baseline justify-between gap-3 mb-3">
-              <h2 className="text-lg font-bold text-slate-900">{r.component || 'Safety recall'}</h2>
-              <span className="text-xs font-mono text-slate-500">NHTSA {r.campaignNumber}</span>
-            </div>
-            {r.summary ? (
-              <div className="mb-3">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">The defect</h3>
-                <p className="text-slate-700 text-sm leading-relaxed">{r.summary}</p>
-              </div>
-            ) : null}
-            {r.consequence ? (
-              <div className="mb-3">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">The risk</h3>
-                <p className="text-slate-700 text-sm leading-relaxed">{r.consequence}</p>
-              </div>
-            ) : null}
-            {r.remedy ? (
-              <div>
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">The fix</h3>
-                <p className="text-slate-700 text-sm leading-relaxed">{r.remedy}</p>
-              </div>
-            ) : null}
-            {r.reportDate ? (
-              <p className="mt-3 text-xs text-slate-400">
-                Reported {r.reportDate.toLocaleDateString('en-US', { dateStyle: 'long' })}
-                {r.manufacturer ? ` by ${r.manufacturer}` : ''}
-              </p>
-            ) : null}
-          </Card>
-        ))}
+      <AnswerBox tone={v.recallCount > 0 ? 'danger' : 'ok'}>
+        <p>
+          <strong>{answer}</strong>
+        </p>
+        <p className="mt-3 text-[0.95rem] text-muted">
+          A recall covers a range of VINs, not every {v.make} {v.model} built. Check your own
+          17-character VIN before assuming yours is affected.
+        </p>
+      </AnswerBox>
+
+      <div className="mt-5 flex flex-wrap items-center gap-3">
+        <a
+          href="https://www.nhtsa.gov/recalls"
+          rel="nofollow noopener"
+          target="_blank"
+          className="inline-flex min-h-11 items-center rounded-full bg-accent px-5 text-sm font-semibold text-accent-fg transition-opacity hover:opacity-90"
+        >
+          Check your VIN on NHTSA
+        </a>
+        <CallLink number={NHTSA_HOTLINE} label={`Call NHTSA ${NHTSA_HOTLINE}`} />
       </div>
 
-      <Card className="p-6 mt-8">
-        <h2 className="text-lg font-bold text-slate-900 mb-2">Checking your own car</h2>
-        <p className="text-slate-600 text-sm leading-relaxed">
-          A recall applies to a range of VINs, not to every {name} built. To confirm whether
-          yours is affected, check the VIN — the 17-character number on the driver-side dashboard
-          or door jamb — on{' '}
-          <a href="https://www.nhtsa.gov/recalls" rel="nofollow noopener" target="_blank" className="text-blue-600 hover:underline">
-            NHTSA&apos;s official lookup
-          </a>
-          . Repairs are free and have no expiry for safety recalls.
-        </p>
-      </Card>
+      <div className="mt-5">
+        <ShareBar title={`${name} recalls`} summary={answer} />
+      </div>
+
+      <section className="mt-10">
+        <SectionHeading id="recalls">
+          {v.recallCount} recall{plural} on the {name}
+        </SectionHeading>
+        <div className="space-y-4">
+          {v.recalls.map((r) => (
+            <Card key={r.id} className="p-5 sm:p-6">
+              <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <h3 className="text-lg font-bold leading-snug text-fg">{r.component || 'Safety recall'}</h3>
+                <Link
+                  href={`/recalls/campaign/${r.campaignNumber.toLowerCase()}`}
+                  className="font-mono text-xs text-accent hover:underline"
+                >
+                  NHTSA {r.campaignNumber}
+                </Link>
+              </div>
+              <dl className="space-y-3">
+                {r.summary ? <Detail term="The defect">{r.summary}</Detail> : null}
+                {r.consequence ? <Detail term="The risk">{r.consequence}</Detail> : null}
+                {r.remedy ? <Detail term="The fix">{r.remedy}</Detail> : null}
+              </dl>
+              {r.reportDate ? (
+                <p className="mt-4 text-xs text-faint">
+                  Reported {r.reportDate.toLocaleDateString('en-US', { dateStyle: 'long' })}
+                  {r.manufacturer ? ` by ${r.manufacturer}` : ''}
+                </p>
+              ) : null}
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <SectionHeading id="your-car">Checking your own car</SectionHeading>
+        <Prose className="space-y-4">
+          <p>
+            A recall applies to a range of VINs, not to every {name} built. To confirm whether yours
+            is affected, find the 17-character VIN on the driver-side dashboard or door jamb and
+            enter it in{' '}
+            <a href="https://www.nhtsa.gov/recalls" rel="nofollow noopener" target="_blank" className="text-accent hover:underline">
+              NHTSA&apos;s official lookup
+            </a>
+            .
+          </p>
+          <p>
+            Repairs for safety recalls are free and never expire. A dealer cannot charge you, and
+            cannot refuse on the grounds that the car is old or out of warranty. If one does, call
+            the NHTSA hotline on <strong>{NHTSA_HOTLINE}</strong>.
+          </p>
+        </Prose>
+      </section>
 
       {otherYears.length > 0 ? (
         <section className="mt-10">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">{v.make} {v.model} by model year</h2>
-          <Card className="p-6">
-            <ul className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-7 gap-y-2 gap-x-4">
+          <SectionHeading>
+            {v.make} {v.model} by model year
+          </SectionHeading>
+          <Card className="p-5 sm:p-6">
+            <ul className="grid grid-cols-3 gap-x-4 gap-y-1 sm:grid-cols-5 lg:grid-cols-7">
               {otherYears.map((o) => (
                 <li key={o.slug}>
-                  <Link href={`/recalls/${o.slug}`} className="text-blue-600 hover:underline">{o.modelYear}</Link>
-                  <span className="text-slate-400 text-xs ml-1">({o.recallCount})</span>
+                  <Link href={`/recalls/${o.slug}`} className="inline-flex min-h-11 items-center gap-1 text-accent hover:underline">
+                    {o.modelYear}
+                    <span className="text-xs text-faint">({o.recallCount})</span>
+                  </Link>
                 </li>
               ))}
             </ul>
+            <p className="mt-3 text-sm">
+              <Link href={modelHub} className="font-medium text-accent hover:underline">
+                All {v.make} {v.model} recalls, every year →
+              </Link>
+            </p>
           </Card>
         </section>
       ) : null}
 
       {sameMake.length > 0 ? (
         <section className="mt-8">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">Other {v.modelYear} {v.make} models</h2>
-          <Card className="p-6">
-            <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-y-2 gap-x-4">
+          <SectionHeading>
+            Other {v.modelYear} {v.make} models
+          </SectionHeading>
+          <Card className="p-5 sm:p-6">
+            <ul className="grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3 lg:grid-cols-4">
               {sameMake.map((o) => (
                 <li key={o.slug}>
-                  <Link href={`/recalls/${o.slug}`} className="text-blue-600 hover:underline">{o.model}</Link>
-                  <span className="text-slate-400 text-xs ml-1">({o.recallCount})</span>
+                  <Link href={`/recalls/${o.slug}`} className="inline-flex min-h-11 items-center gap-1 text-accent hover:underline">
+                    {o.model}
+                    <span className="text-xs text-faint">({o.recallCount})</span>
+                  </Link>
                 </li>
               ))}
             </ul>
           </Card>
         </section>
       ) : null}
+
+      <div className="mt-10 border-t border-edge pt-6">
+        <ShareBar title={`${name} recalls`} summary={answer} />
+      </div>
     </Page>
+  );
+}
+
+function Detail({ term, children }: { term: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <dt className="mb-1 text-xs font-semibold uppercase tracking-wider text-faint">{term}</dt>
+      <dd className="text-[0.975rem] leading-relaxed text-muted">{children}</dd>
+    </div>
   );
 }

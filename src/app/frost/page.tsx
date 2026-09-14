@@ -74,15 +74,15 @@ export default async function FrostIndex() {
       />
 
       <section className="mb-10">
-        <h2 className="text-xl font-bold text-slate-900 mb-4">Largest ZIP codes</h2>
+        <h2 className="text-xl font-bold text-fg mb-4">Largest ZIP codes</h2>
         <Card className="p-6">
           <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-y-2 gap-x-4">
             {biggest.map((z) => (
               <li key={z.slug}>
-                <Link href={`/frost/${z.slug}`} className="text-blue-600 hover:underline">
+                <Link href={`/frost/${z.slug}`} className="text-accent hover:underline">
                   {z.zip}
                 </Link>
-                <span className="text-slate-400 text-xs ml-1">
+                <span className="text-faint text-xs ml-1">
                   {z.city}{z.zone ? ` · ${z.zone}` : ''}
                 </span>
               </li>
@@ -92,13 +92,13 @@ export default async function FrostIndex() {
       </section>
 
       <section>
-        <h2 className="text-xl font-bold text-slate-900 mb-4">Coverage by state</h2>
+        <h2 className="text-xl font-bold text-fg mb-4">Coverage by state</h2>
         <Card className="p-6">
-          <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-y-2 gap-x-4 text-slate-700">
+          <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-y-2 gap-x-4 text-fg">
             {byState.filter((s) => s.state && US_STATES[s.state]).map((s) => (
               <li key={s.state}>
                 {stateName(s.state)}
-                <span className="text-slate-400 text-sm ml-1">({formatNumber(s._count._all)})</span>
+                <span className="text-faint text-sm ml-1">({formatNumber(s._count._all)})</span>
               </li>
             ))}
           </ul>

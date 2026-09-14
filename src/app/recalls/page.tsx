@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { DATASETS } from '@/lib/datasets';
-import { absoluteUrl, formatNumber } from '@/lib/site';
-import { Page, Card, Breadcrumbs, PageHeader, EmptyState, JsonLd } from '@/components/Layout';
+import { absoluteUrl, formatNumber, slugify } from '@/lib/site';
+import { Page, Card, Breadcrumbs, PageHeader, EmptyState, JsonLd, SectionHeading } from '@/components/Layout';
 import { DirectoryTable } from '@/components/Directory';
 
 // Not prerendered: the build container has no database.
@@ -28,7 +28,6 @@ const getSummary = unstable_cache(
         by: ['make'],
         _count: { _all: true },
         orderBy: { _count: { make: 'desc' } },
-        take: 40,
       }),
       prisma.vehicle.findMany({
         select: { slug: true, modelYear: true, make: true, model: true, recallCount: true },
@@ -63,20 +62,25 @@ export default async function RecallsIndex() {
       />
 
       <section className="mb-10">
-        <h2 className="text-xl font-bold text-slate-900 mb-4">Browse by make</h2>
-        <Card className="p-6">
-          <ul className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-y-2 gap-x-4">
+        <SectionHeading id="makes">Browse by make</SectionHeading>
+        <Card className="p-5 sm:p-6">
+          <ul className="grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3 lg:grid-cols-4">
             {byMake.map((m) => (
-              <li key={m.make} className="text-slate-700">
-                {m.make}
-                <span className="text-slate-400 text-sm ml-1">({formatNumber(m._count._all)})</span>
+              <li key={m.make}>
+                <Link
+                  href={`/recalls/make/${slugify(m.make)}`}
+                  className="inline-flex min-h-11 items-center gap-1.5 text-accent hover:underline"
+                >
+                  {m.make}
+                  <span className="text-xs text-faint">({formatNumber(m._count._all)})</span>
+                </Link>
               </li>
             ))}
           </ul>
         </Card>
       </section>
 
-      <h2 className="text-xl font-bold text-slate-900 mb-4">Most recalled vehicles</h2>
+      <SectionHeading id="worst">Most recalled vehicles</SectionHeading>
       <DirectoryTable
         basePath="/recalls"
         headers={['Vehicle', 'Make', 'Recalls']}
@@ -88,9 +92,9 @@ export default async function RecallsIndex() {
         }))}
       />
 
-      <p className="mt-8 text-sm text-slate-500">
+      <p className="mt-8 max-w-[68ch] text-sm text-faint">
         Source:{' '}
-        <Link href={config.sourceUrl} className="text-blue-600 hover:underline">
+        <Link href={config.sourceUrl} className="text-accent hover:underline">
           NHTSA
         </Link>
         . A recall covers a VIN range, not every vehicle of that model — check your own VIN before

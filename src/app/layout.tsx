@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { SITE_NAME, siteUrl } from '@/lib/site';
@@ -17,6 +17,15 @@ export const metadata: Metadata = {
   openGraph: { siteName: SITE_NAME, type: 'website', locale: 'en_US' },
   twitter: { card: 'summary_large_image' },
   robots: { index: true, follow: true },
+};
+
+/** Matches the browser chrome to the page in both themes. */
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f5f6f8' },
+    { media: '(prefers-color-scheme: dark)', color: '#0c0f16' },
+  ],
+  colorScheme: 'light dark',
 };
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
