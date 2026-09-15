@@ -62,7 +62,12 @@ npx tsx scripts/build_static_site.ts --section "$SECTION" --origin "http://local
 HOST="${NEXT_PUBLIC_SITE_URL#https://}"
 
 # IndexNow verifies ownership by fetching this file, so it has to ship with the
-# site rather than be uploaded afterwards.
+# site rather than be uploaded afterwards. The key lives in .env, which this
+# shell does not source on its own; a publish without it silently strips the
+# file from the live site.
+if [ -z "${INDEXNOW_KEY:-}" ] && [ -f .env ]; then
+  INDEXNOW_KEY=$(grep -E '^INDEXNOW_KEY=' .env | cut -d= -f2- | tr -d '"' || true)
+fi
 if [ -n "${INDEXNOW_KEY:-}" ]; then
   printf '%s' "$INDEXNOW_KEY" > "static/$SECTION/$INDEXNOW_KEY.txt"
   echo "==> IndexNow key file written for $HOST"
