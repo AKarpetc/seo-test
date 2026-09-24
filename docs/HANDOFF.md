@@ -420,6 +420,7 @@ Compute → Workers & Pages: там пусто. Открывать напрям�
 
 ```
 npm run status                    # что загружено, и что реально отдают живые сайты
+npm run traffic -- 7              # визиты, переходы из поиска и топ страниц за 7 дней (нужен CLOUDFLARE_ANALYTICS_TOKEN)
 npm run indexnow -- --dir static/frost --host frostdatefinder.com --dry-run
 npm run keywords "<фраза>"        # поиск ниш через Google autocomplete
 npm run publish -- frost          # собрать и выложить сайт
