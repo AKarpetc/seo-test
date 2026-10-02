@@ -39,7 +39,8 @@
     "load:complaints": "tsx scripts/load_complaints.ts",
     "load:snow": "tsx scripts/load_snow.ts",
     "load:storms": "tsx scripts/load_storms.ts",
-    "traffic": "tsx scripts/ops/traffic.ts"
+    "traffic": "tsx scripts/ops/traffic.ts",
+    "hail:places": "tsx scripts/fetch_hail_places.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1131.0",

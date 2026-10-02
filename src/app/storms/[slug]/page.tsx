@@ -9,6 +9,8 @@ import {
 } from '@/components/Layout';
 import { ShareBar } from '@/components/Share';
 import { AdSlot } from '@/components/Ads';
+import { HailLink } from '@/components/HailLink';
+import { hailCityUrl } from '@/lib/hail';
 
 export const revalidate = 86400;
 
@@ -74,6 +76,7 @@ export default async function CityStormPage({ params }: Props) {
 
   const { place, answer } = describe(city);
   const shareTitle = `Storms that hit ${city.city}, ${city.state}`;
+  const hailUrl = hailCityUrl(city.state, city.city);
 
   const decades = new Map<string, { total: number; strong: number }>();
   for (const t of city.tornadoes) {
@@ -218,6 +221,8 @@ export default async function CityStormPage({ params }: Props) {
           </p>
         </section>
       ) : null}
+
+      {hailUrl ? <HailLink href={hailUrl} place={city.city} /> : null}
 
       <section className="mt-10">
         <SectionHeading id="reading">How to read this page</SectionHeading>

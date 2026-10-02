@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { absoluteUrl, formatNumber, stateName, US_STATES } from '@/lib/site';
 import { Page, Card, Stat, Breadcrumbs, PageHeader, JsonLd, AnswerBox } from '@/components/Layout';
+import { HailLink } from '@/components/HailLink';
+import { hailStateUrl } from '@/lib/hail';
 
 export const revalidate = 86400;
 
@@ -40,6 +42,7 @@ export default async function StatePage({ params }: Props) {
   if (!data) notFound();
 
   const name = stateName(data.state);
+  const hailUrl = hailStateUrl(data.state);
   const mostHurricanes = [...data.cities].sort((a, b) => b.hurricaneCount - a.hurricaneCount)[0];
   const mostTornadoes = [...data.cities].sort((a, b) => b.tornadoCount - a.tornadoCount)[0];
   const answer =
@@ -95,6 +98,8 @@ export default async function StatePage({ params }: Props) {
           </div>
         </Card>
       </section>
+
+      {hailUrl ? <HailLink href={hailUrl} place={name} /> : null}
     </Page>
   );
 }
